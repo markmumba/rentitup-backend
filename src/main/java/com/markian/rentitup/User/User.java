@@ -41,11 +41,4 @@ public class User  extends BaseEntity {
     @OneToMany(mappedBy = "reviewer")
     private List<Review> reviews;
 
-
-    public enum Role{
-        OWNER,
-        CUSTOMER,
-        ADMIN
-    }
-
 }

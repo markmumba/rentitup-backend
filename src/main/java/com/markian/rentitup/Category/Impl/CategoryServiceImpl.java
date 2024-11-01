@@ -8,6 +8,7 @@ import com.markian.rentitup.Category.Dto.CategoryMapper;
 import com.markian.rentitup.Category.Dto.CategoryRequestDto;
 import com.markian.rentitup.Category.Dto.CategoryResponseDto;
 import com.markian.rentitup.Exceptions.CategoryException;
+import com.markian.rentitup.Exceptions.MachineException;
 import org.springframework.stereotype.Service;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -40,18 +41,17 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponseDto createCategory(CategoryRequestDto categoryRequestDto) throws CategoryException {
-
-
-        if (categoryRepository.existsByName(categoryRequestDto.getName())) {
-            throw new CategoryException("The category already exists");
-        }
         try {
+            if (categoryRepository.existsByName(categoryRequestDto.getName())) {
+                throw new CategoryException("The category already exists");
+            }
             Category category = categoryMapper.toCategory(categoryRequestDto);
             return categoryMapper.toCategoryResponseDto(
                     categoryRepository.save(category)
             );
+        } catch (CategoryException e) {
+            throw e;
         } catch (Exception e) {
-            LOGGER.error("failed to create category ,Name: {} Error: {}", categoryRequestDto, e.getMessage(), e);
             throw new CategoryException("Error occurred when creating category ", e);
         }
     }
@@ -65,8 +65,10 @@ public class CategoryServiceImpl implements CategoryService {
                     .orElseThrow(() -> new CategoryException("could not find category by  " + id));
             return categoryMapper.toCategoryResponseDto(category);
 
+        } catch (CategoryException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CategoryException("Error getting category by id " + e.getMessage(), e);
         }
     }
 
@@ -91,8 +93,10 @@ public class CategoryServiceImpl implements CategoryService {
             categoryRepository.save(category);
 
             return "Category updated successful";
+        } catch (CategoryException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CategoryException("Unable to update category " + e.getMessage(), e);
         }
     }
 
@@ -104,8 +108,10 @@ public class CategoryServiceImpl implements CategoryService {
             categoryRepository.delete(category);
             return "category deleted successfully";
 
+        } catch (CategoryException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CategoryException("Unable to delete category " + e.getMessage(), e);
         }
     }
 }

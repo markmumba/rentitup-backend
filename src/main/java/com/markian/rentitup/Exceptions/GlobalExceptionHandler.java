@@ -23,6 +23,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleMachineException(MachineException exception) {
         return  new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(UserException.class)
+    public ResponseEntity<String> handleUserException(UserException exception) {
+        return  new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
