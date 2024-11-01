@@ -1,14 +1,14 @@
 package com.markian.rentitup.User.UserDto;
 
-import com.markian.rentitup.Machine.Machine;
-import com.markian.rentitup.Machine.MachineDto.MachineListResponseDto;
 import com.markian.rentitup.Machine.MachineDto.MachineMapper;
 import com.markian.rentitup.Machine.MachineDto.MachineResponseDto;
 import com.markian.rentitup.User.User;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class UserMapper {
 
     private final MachineMapper machineMapper;
