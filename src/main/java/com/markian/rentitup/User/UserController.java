@@ -25,6 +25,14 @@ public class UserController {
         return ResponseEntity.ok(userListResponseDtoList);
     }
 
+    @PostMapping
+    public ResponseEntity<UserResponseDto> createUser(
+            @RequestBody UserRequestDto userRequestDto
+    ) {
+        UserResponseDto userResponseDto = userService.registerUser(userRequestDto);
+        return ResponseEntity.ok(userResponseDto);
+    }
+
     @GetMapping("/owners")
     public ResponseEntity<List<UserListResponseDto>> getAllOwners() {
         List<UserListResponseDto> userListResponseDtoList = userService.getAllOwners();
@@ -43,7 +51,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
         String response = userService.deleteUser(id);
         return ResponseEntity.ok(response);

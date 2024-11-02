@@ -55,5 +55,4 @@ public class UserMapper {
         responseDto.setVerified(user.getVerifiedAt() != null);
         return responseDto;
     }
-
 }

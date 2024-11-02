@@ -80,9 +80,12 @@ public class MachineServiceImpl implements MachineService {
             Category category = categoryRepository.findById(machineRequestDto.getCategoryId())
                     .orElseThrow(() -> new MachineException("Category not found with id: " + machineRequestDto.getCategoryId()));
 
+            User user =  userRepository.findById(machineRequestDto.getOwnerId())
+                    .orElseThrow(()-> new UserException("Owner of id not found"));
 
             Machine machine = machineMapper.toEntity(machineRequestDto);
             machine.setCategory(category);
+            machine.setOwner(user);
             machine.setIsAvailable(true);
 
             return machineMapper.toResponseDto(
@@ -91,7 +94,8 @@ public class MachineServiceImpl implements MachineService {
 
         } catch (MachineException e) {
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new MachineException("Error while creating a machine " + e.getMessage(), e);
         }
     }

@@ -26,6 +26,8 @@ public class MachineRequestDto {
     @NotNull
     private Long categoryId;
 
+    @NotNull
+    private Long ownerId;
 
 }
 

@@ -23,7 +23,7 @@ public class CategoryMapper {
                 category.getPriceCalculationType(),
                 category.getMachines() != null ? category.getMachines().stream()
                         .map(machineMapper::toResponseDto)
-                        .collect(Collectors.toList())
+                        .toList()
                         : null
         );
     }
