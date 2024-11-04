@@ -32,6 +32,10 @@ public class GlobalExceptionHandler {
         return  new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(BookingException.class)
+    public ResponseEntity<String> handleBookingException(BookingException exception) {
+        return  new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {

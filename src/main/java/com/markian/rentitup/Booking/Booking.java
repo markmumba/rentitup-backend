@@ -19,6 +19,9 @@ import java.util.List;
 @Entity(name = "booking")
 public class Booking extends BaseEntity {
 
+    @Column(nullable = false, unique = true)
+    private String bookingCode;
+
     @Column(nullable = false)
     private LocalDate startDate;
 
@@ -48,14 +51,5 @@ public class Booking extends BaseEntity {
 
 
 
-
-
-    public enum BookingStatus {
-        PENDING,
-        CONFIRMED,
-        ONGOING,
-        COMPLETED,
-        CANCELLED
-    }
 
 }
