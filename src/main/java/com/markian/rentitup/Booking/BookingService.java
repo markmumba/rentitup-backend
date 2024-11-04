@@ -9,12 +9,20 @@ import java.util.List;
 
 public interface BookingService {
     BookingResponseDto createBooking(BookingRequestDto bookingRequestDto) throws BookingException;
+
     List<BookingListResponseDto> getAllBookings();
+
     List<BookingListResponseDto> getBookingsByUser(Long userId) throws BookingException;
+
     BookingResponseDto getBooking(Long id) throws BookingException;
-    List<BookingListResponseDto> getBookingsByStatus(Long userId,String status);
-    String updateBooking(Long id,BookingRequestDto bookingRequestDto) throws BookingException;
+
+    List<BookingListResponseDto> getBookingsByStatus(Long userId, String status);
+
+    String updateBooking(Long id, BookingRequestDto bookingRequestDto) throws BookingException;
+
     String deleteBooking(Long id) throws BookingException;
-    String updateStatus(Long id,String status)throws BookingException;
-    BookingResponseDto getBookingByCode (String code)throws BookingException;
+
+    String updateStatus(Long id, String status) throws BookingException;
+
+    BookingResponseDto getBookingByCode(String code) throws BookingException;
 }

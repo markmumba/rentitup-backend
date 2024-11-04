@@ -31,7 +31,7 @@ public class BookingResponseDto {
 
     private BigDecimal totalAmount;
 
-    private Long machineId;
 
-    private Long customerId;
+    private BookingMapper.MachineSimpleResponseDto machine;
+    private BookingMapper.UserSimpleResponseDto customer;
 }

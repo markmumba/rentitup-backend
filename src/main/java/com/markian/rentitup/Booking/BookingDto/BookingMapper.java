@@ -1,10 +1,31 @@
 package com.markian.rentitup.Booking.BookingDto;
 
 import com.markian.rentitup.Booking.Booking;
+import com.markian.rentitup.User.Role;
+import com.markian.rentitup.User.User;
+import lombok.Data;
 import org.springframework.stereotype.Service;
 
 @Service
 public class BookingMapper {
+
+
+    @Data
+    public static class MachineSimpleResponseDto {
+        private Long id;
+        private String name;
+        private String specification;
+        private UserSimpleResponseDto owner;
+        // other fields as needed
+    }
+
+    @Data
+    public static class UserSimpleResponseDto {
+        private Long id;
+        private String name;
+        private String email;
+        private Role role;
+    }
 
     public BookingResponseDto toResponseDto(Booking booking) {
         BookingResponseDto responseDto = new BookingResponseDto();
@@ -15,8 +36,33 @@ public class BookingMapper {
         responseDto.setPickUpLocation(booking.getPickUpLocation());
         responseDto.setStatus(booking.getStatus());
         responseDto.setTotalAmount(booking.getTotalAmount());
-        responseDto.setMachineId(booking.getMachine() != null ? booking.getMachine().getId() : null);
-        responseDto.setCustomerId(booking.getCustomer() != null ? booking.getCustomer().getId() : null);
+
+        if (booking.getMachine() != null) {
+            MachineSimpleResponseDto machineDto = new MachineSimpleResponseDto();
+            machineDto.setId(booking.getMachine().getId());
+            machineDto.setName(booking.getMachine().getName());
+            machineDto.setSpecification(booking.getMachine().getSpecification());
+
+            UserSimpleResponseDto ownerDto = new UserSimpleResponseDto();
+            ownerDto.setId(booking.getMachine().getOwner().getId());
+            ownerDto.setName(booking.getMachine().getOwner().getFullName());
+            ownerDto.setEmail(booking.getMachine().getOwner().getEmail());
+            ownerDto.setRole(booking.getMachine().getOwner().getRole());
+
+            machineDto.setOwner(ownerDto);
+            responseDto.setMachine(machineDto);
+
+
+        }
+
+        if (booking.getCustomer() != null) {
+            UserSimpleResponseDto customerDto = new UserSimpleResponseDto();
+            customerDto.setId(booking.getCustomer().getId());
+            customerDto.setName(booking.getCustomer().getFullName());
+            customerDto.setEmail(booking.getCustomer().getEmail());
+            customerDto.setRole(booking.getCustomer().getRole());
+            responseDto.setCustomer(customerDto);
+        }
 
         return responseDto;
     }

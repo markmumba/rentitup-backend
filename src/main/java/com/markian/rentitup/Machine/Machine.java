@@ -34,7 +34,7 @@ public class Machine extends BaseEntity {
 
     private Boolean isAvailable;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id")
     private User owner;
 

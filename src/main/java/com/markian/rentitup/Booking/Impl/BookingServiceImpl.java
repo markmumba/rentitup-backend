@@ -133,7 +133,7 @@ public class BookingServiceImpl implements BookingService {
                     .toList();
 
         } catch (Exception e) {
-            throw new BookingException("Error getting bookings by status", e);
+            throw new BookingException("Error getting bookings by status " + e.getMessage(), e);
         }
     }
 
