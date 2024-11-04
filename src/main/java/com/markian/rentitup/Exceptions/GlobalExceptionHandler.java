@@ -27,7 +27,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUserException(UserException exception) {
         return  new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
-
+    @ExceptionHandler(MachineImageException.class)
+    public ResponseEntity<String> handleMachineImageException(MachineImageException exception) {
+        return  new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
