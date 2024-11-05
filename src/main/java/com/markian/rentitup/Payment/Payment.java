@@ -25,17 +25,4 @@ public class Payment extends BaseEntity {
     @JoinColumn(name = "booking_id")
     private Booking booking;
 
-    public enum PaymentType {
-        DEPOSIT,
-        FULL_PAYMENT,
-        SECURITY_DEPOSIT
-    }
-
-    public enum PaymentStatus {
-        PENDING,
-        COMPLETED,
-        REFUNDED,
-        FAILED
-    }
-
 }

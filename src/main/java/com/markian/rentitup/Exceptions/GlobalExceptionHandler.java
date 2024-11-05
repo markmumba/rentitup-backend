@@ -16,26 +16,34 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     @ExceptionHandler(CategoryException.class)
     public ResponseEntity<String> handleCategoryException(CategoryException exception) {
-        return  new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MachineException.class)
     public ResponseEntity<String> handleMachineException(MachineException exception) {
-        return  new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(UserException.class)
     public ResponseEntity<String> handleUserException(UserException exception) {
-        return  new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(MachineImageException.class)
     public ResponseEntity<String> handleMachineImageException(MachineImageException exception) {
-        return  new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BookingException.class)
     public ResponseEntity<String> handleBookingException(BookingException exception) {
-        return  new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ReviewException.class)
+    public ResponseEntity<String> handleReviewException(ReviewException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
