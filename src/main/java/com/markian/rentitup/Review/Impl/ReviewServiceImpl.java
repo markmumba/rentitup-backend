@@ -15,9 +15,11 @@ import com.markian.rentitup.Review.ReviewRepository;
 import com.markian.rentitup.Review.ReviewService;
 import com.markian.rentitup.User.User;
 import com.markian.rentitup.User.UserRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class ReviewServiceImpl implements ReviewService {
 
     private final BookingRepository bookingRepository;

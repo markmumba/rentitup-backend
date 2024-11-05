@@ -1,18 +1,19 @@
 package com.markian.rentitup.User;
 
 import com.markian.rentitup.Exceptions.UserException;
-import com.markian.rentitup.User.UserDto.UserListResponseDto;
-import com.markian.rentitup.User.UserDto.UserRequestDto;
-import com.markian.rentitup.User.UserDto.UserResponseDto;
+import com.markian.rentitup.User.UserDto.*;
 
 import java.util.List;
 
 public interface UserService {
+    UserResponseDto registerUser(UserRequestDto userRequestDto) throws UserException;
+
+    AuthResponse login (LoginRequest loginRequest)throws UserException;
+
     List<UserListResponseDto> getAllUsers();
 
     List<UserListResponseDto> getAllOwners();
 
-    UserResponseDto registerUser(UserRequestDto userRequestDto) throws UserException;
 
     UserResponseDto getOwnerInfo(Long id) throws UserException;
 

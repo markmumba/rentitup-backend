@@ -3,12 +3,13 @@ package com.markian.rentitup.User.Impl;
 import com.markian.rentitup.Exceptions.UserException;
 import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
-import com.markian.rentitup.User.UserDto.UserListResponseDto;
-import com.markian.rentitup.User.UserDto.UserMapper;
-import com.markian.rentitup.User.UserDto.UserRequestDto;
-import com.markian.rentitup.User.UserDto.UserResponseDto;
+import com.markian.rentitup.User.UserDto.*;
 import com.markian.rentitup.User.UserRepository;
 import com.markian.rentitup.User.UserService;
+import com.markian.rentitup.Utils.JwtTokenUtil;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,9 +22,65 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final AuthenticationManager authenticationManager;
+
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, JwtTokenUtil jwtTokenUtil, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.authenticationManager = authenticationManager;
+    }
+
+    @Override
+    public UserResponseDto registerUser(UserRequestDto userRequestDto) throws UserException {
+        try {
+            if (userRequestDto.getRole() == null || userRequestDto.getRole().isBlank()) {
+                throw new UserException("Role must be specified.");
+            }
+            if (!isValidRole(userRequestDto.getRole())) {
+                throw new UserException("Invalid role specified.");
+            }
+            if (userRepository.existsByEmail(userRequestDto.getEmail())) {
+                throw new UserException(userRequestDto.getEmail() + " already exists.");
+            }
+
+            userRequestDto.setPassword(passwordEncoder.encode(userRequestDto.getPassword()));
+            User user = userRepository.save(
+                    userMapper.toEntity(userRequestDto)
+            );
+            return userMapper.toResponseDto(user);
+
+        } catch (UserException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new UserException("Failed to register user " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public AuthResponse login(LoginRequest loginRequest) throws UserException {
+        try {
+
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
+            var user = userRepository.findByEmail(loginRequest.getEmail())
+                    .orElseThrow(() -> new UserException("User not found"));
+
+            var token = jwtTokenUtil.generateToken(user);
+
+            AuthResponse authResponse = new AuthResponse();
+            authResponse.setToken(token);
+            authResponse.setUserDetails(user);
+            return authResponse;
+        } catch (UserException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new UserException("Error while logging in " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -52,23 +109,15 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    @Override
-    public UserResponseDto registerUser(UserRequestDto userRequestDto) throws UserException {
-        try {
-            if (userRepository.existsByEmail(userRequestDto.getEmail())) {
-                throw new UserException("The category already exists");
+    private boolean isValidRole(String role) {
+        for (Role r : Role.values()) {
+            if (r.name().equals(role)) {
+                return true;
             }
-
-            User user = userRepository.save(
-                    userMapper.toEntity(userRequestDto)
-            );
-            return userMapper.toResponseDto(user);
-        } catch (UserException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
+        return false;
     }
+
 
     @Override
     public UserResponseDto getOwnerInfo(Long id) throws UserException {
@@ -118,7 +167,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String deleteUser(Long id) throws UserException {
-        try{
+        try {
             User user = userRepository.findById(id).orElseThrow(
                     () -> new UserException("No user with the id " + id)
             );
@@ -126,10 +175,9 @@ public class UserServiceImpl implements UserService {
 
             return "User deleted successfully";
         } catch (UserException e) {
-           throw e;
-        }
-        catch (Exception e) {
-            throw new UserException("Error occurred when deleting user" + e.getMessage(),e);
+            throw e;
+        } catch (Exception e) {
+            throw new UserException("Error occurred when deleting user" + e.getMessage(), e);
         }
     }
 }

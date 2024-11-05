@@ -2,6 +2,7 @@ package com.markian.rentitup.User.UserDto;
 
 import com.markian.rentitup.Machine.MachineDto.MachineMapper;
 import com.markian.rentitup.Machine.MachineDto.MachineResponseDto;
+import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class UserMapper {
         user.setPassword(dto.getPassword());
         user.setFullName(dto.getFullName());
         user.setPhone(dto.getPhone());
-        user.setRole(dto.getRole());
+        user.setRole(Role.valueOf(dto.getRole()));
         return user;
     }
 
