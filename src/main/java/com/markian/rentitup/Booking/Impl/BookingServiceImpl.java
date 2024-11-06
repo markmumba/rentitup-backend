@@ -10,14 +10,18 @@ import com.markian.rentitup.Booking.BookingService;
 import com.markian.rentitup.Booking.BookingStatus;
 import com.markian.rentitup.Exceptions.BookingException;
 import com.markian.rentitup.Exceptions.MachineException;
+import com.markian.rentitup.Exceptions.UserException;
 import com.markian.rentitup.Machine.Machine;
 import com.markian.rentitup.Machine.MachineRepository;
+import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
 import com.markian.rentitup.User.UserRepository;
 import com.markian.rentitup.Utils.Utils;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Book;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -40,6 +44,13 @@ public class BookingServiceImpl implements BookingService {
             Machine machine = machineRepository.findById(bookingRequestDto.getMachineId())
                     .orElseThrow(() -> new MachineException("Machine with id " + bookingRequestDto.getMachineId() + " not found"));
             List<Booking> existingBookings = bookingRepository.findAllByMachineId(bookingRequestDto.getMachineId());
+            User user = userRepository.findById(bookingRequestDto.getCustomerId()).orElseThrow(
+                    () -> new UserException("User with id " + bookingRequestDto.getCustomerId() + "not found")
+            );
+
+            if (user.getRole() != Role.CUSTOMER) {
+                throw new UserException("To make a booking you need to be a customer");
+            }
 
             LocalDate requestedStartDate = bookingRequestDto.getStartDate();
             LocalDate requestedEndDate = bookingRequestDto.getEndDate();
@@ -94,14 +105,44 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingListResponseDto> getBookingsByUser(Long userId) throws BookingException {
         try {
+            User user = userRepository.findById(userId).orElseThrow(
+                    () -> new UserException("Cannot find user of id " + userId + ".")
+            );
+            if (user.getRole() != Role.CUSTOMER) {
+                throw new UserException("User is not a customer ");
+            }
             List<Booking> bookings = bookingRepository.findAllByCustomerId(userId);
             return bookings.stream()
                     .map(bookingMapper::toListDto)
                     .toList();
+        } catch (UserException e) {
+            throw e;
         } catch (Exception e) {
             throw new BookingException("Error getting users bookings " + e.getMessage(), e);
         }
 
+    }
+
+    @Override
+    public List<BookingListResponseDto> getBookingsForOwner(Long ownerId) throws BookingException {
+        try {
+            User user = userRepository.findById(ownerId).orElseThrow(
+                    () -> new UserException("Cannot find user of id " + ownerId + ".")
+            );
+            if (user.getRole() != Role.OWNER) {
+                throw new UserException("User is not a customer ");
+            }
+            List<Booking> bookings = bookingRepository.findAllByMachineOwnerId(ownerId);
+
+            return bookings.stream()
+                    .map(bookingMapper::toListDto)
+                    .toList();
+
+        } catch (UserException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BookingException("Error getting users bookings " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -121,12 +162,20 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingListResponseDto> getBookingsByStatus(Long userId, String status) {
         try {
+
+            User user = userRepository.findById(userId).orElseThrow(
+                    () -> new UserException("Cannot find user of id " + userId + ".")
+            );
+            if (user.getRole() != Role.CUSTOMER) {
+                throw new UserException("User is not a customer ");
+            }
             BookingStatus bookingStatus;
             try {
                 bookingStatus = BookingStatus.valueOf(status);
             } catch (IllegalArgumentException e) {
                 throw new BookingException("Invalid Status", e);
             }
+
             return bookingRepository.findAllByCustomerIdAndStatus(userId, bookingStatus)
                     .stream()
                     .map(bookingMapper::toListDto)
@@ -171,6 +220,7 @@ public class BookingServiceImpl implements BookingService {
             Booking booking = bookingRepository.findById(id)
                     .orElseThrow(() -> new BookingException("Booking with id " + id + " not found"));
 
+            booking.setStatus(BookingStatus.CANCELLED);
             bookingRepository.delete(booking);
             return "Booking deleted successfully";
         } catch (Exception e) {
@@ -212,4 +262,21 @@ public class BookingServiceImpl implements BookingService {
         }
 
     }
+
+    @Override
+    public List<String> getBookingStatus() {
+        try {
+            return Arrays.asList(
+                    BookingStatus.PENDING.name(),
+                    BookingStatus.CONFIRMED.name(),
+                    BookingStatus.ONGOING.name(),
+                    BookingStatus.COMPLETED.name(),
+                    BookingStatus.CANCELLED.name()
+            );
+        } catch (Exception e) {
+            throw new BookingException("Unable to get booking states " + e.getMessage(), e);
+        }
+    }
+
+
 }

@@ -18,9 +18,6 @@ public class ReviewRequestDto {
     @NotBlank(message = "Comment cannot be blank")
     private String comment;
 
-    @NotNull(message = "Booking ID is required")
-    private Long bookingId;
-
     @NotNull(message = "Reviewer ID is required")
     private Long reviewerId;
 }

@@ -4,6 +4,7 @@ import com.markian.rentitup.User.UserDto.UserListResponseDto;
 import com.markian.rentitup.User.UserDto.UserRequestDto;
 import com.markian.rentitup.User.UserDto.UserResponseDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,20 +20,16 @@ public class UserController {
     }
 
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserListResponseDto>> getAllUsers() {
         List<UserListResponseDto> userListResponseDtoList = userService.getAllUsers();
         return ResponseEntity.ok(userListResponseDtoList);
     }
 
-    @PostMapping
-    public ResponseEntity<UserResponseDto> createUser(
-            @RequestBody UserRequestDto userRequestDto
-    ) {
-        UserResponseDto userResponseDto = userService.registerUser(userRequestDto);
-        return ResponseEntity.ok(userResponseDto);
-    }
 
+
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/owners")
     public ResponseEntity<List<UserListResponseDto>> getAllOwners() {
         List<UserListResponseDto> userListResponseDtoList = userService.getAllOwners();

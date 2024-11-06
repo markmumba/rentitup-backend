@@ -62,8 +62,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/auth/**",
-                                "/api/v1/rooms/**",
-                                "/api/v1/bookings/**"
+                                "/api/v1/categories/**",
+                                "/api/v1/machines/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

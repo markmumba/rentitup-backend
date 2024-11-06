@@ -14,6 +14,8 @@ public interface BookingService {
 
     List<BookingListResponseDto> getBookingsByUser(Long userId) throws BookingException;
 
+    List<BookingListResponseDto> getBookingsForOwner(Long ownerId) throws BookingException;
+
     BookingResponseDto getBooking(Long id) throws BookingException;
 
     List<BookingListResponseDto> getBookingsByStatus(Long userId, String status);
@@ -25,4 +27,8 @@ public interface BookingService {
     String updateStatus(Long id, String status) throws BookingException;
 
     BookingResponseDto getBookingByCode(String code) throws BookingException;
+
+    List<String> getBookingStatus() ;
+
+
 }

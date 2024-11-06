@@ -7,6 +7,7 @@ import com.markian.rentitup.Category.Dto.CategoryListResponse;
 import com.markian.rentitup.Category.Dto.CategoryMapper;
 import com.markian.rentitup.Category.Dto.CategoryRequestDto;
 import com.markian.rentitup.Category.Dto.CategoryResponseDto;
+import com.markian.rentitup.Category.PriceCalculationType;
 import com.markian.rentitup.Exceptions.CategoryException;
 import com.markian.rentitup.Exceptions.MachineException;
 import org.springframework.stereotype.Service;
@@ -75,9 +76,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<String> getPriceCalculationType() {
         return Arrays.asList(
-                Category.PriceCalculationType.HOURLY.name(),
-                Category.PriceCalculationType.DAILY.name(),
-                Category.PriceCalculationType.DISTANCE_BASED.name()
+                PriceCalculationType.HOURLY.name(),
+                PriceCalculationType.DAILY.name(),
+                PriceCalculationType.DISTANCE_BASED.name()
         );
     }
 

@@ -2,6 +2,7 @@ package com.markian.rentitup.MachineImage;
 
 import com.markian.rentitup.MachineImage.MachineImageDto.MachineImageResponseDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +20,7 @@ public class MachineImageController {
     }
 
 
+    @PreAuthorize("hasAuthority('OWNER')")
     @PostMapping
     public ResponseEntity<String> uploadMachineImages(
             @PathVariable(value = "machineId", required = true) Long machineId,
@@ -45,6 +47,7 @@ public class MachineImageController {
         return ResponseEntity.ok(machineImage);
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
     @DeleteMapping("/{imageId}")
     public ResponseEntity<String> deleteMachineImage(
             @PathVariable(value = "machineId", required = true) Long machineId,

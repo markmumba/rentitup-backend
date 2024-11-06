@@ -5,6 +5,7 @@ import com.markian.rentitup.Booking.BookingDto.BookingRequestDto;
 import com.markian.rentitup.Booking.BookingDto.BookingResponseDto;
 import com.markian.rentitup.User.UserRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,12 +20,14 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public ResponseEntity<List<BookingListResponseDto>> getAllBookings() {
         List<BookingListResponseDto> bookingList = bookingService.getAllBookings();
         return ResponseEntity.ok(bookingList);
     }
 
+    @PreAuthorize("hasAuthority('CUSTOMER')")
     @PostMapping
     public ResponseEntity<BookingResponseDto> createBooking(
             @RequestBody BookingRequestDto bookingRequestDto
@@ -33,11 +36,22 @@ public class BookingController {
         return ResponseEntity.ok(bookingResponseDto);
     }
 
+
+    @PreAuthorize("hasAuthority('CUSTOMER')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<BookingListResponseDto>> getBookingsByUser(
             @PathVariable("userId") Long userId
     ) {
         List<BookingListResponseDto> bookingList = bookingService.getBookingsByUser(userId);
+        return ResponseEntity.ok(bookingList);
+    }
+
+    @PreAuthorize("hasAuthority('OWNER')")
+    @GetMapping("/owner/{ownerId}")
+    public ResponseEntity<List<BookingListResponseDto>> getBookingForOwner(
+            @PathVariable("ownerId") Long ownerId
+    ) {
+        List<BookingListResponseDto> bookingList = bookingService.getBookingsForOwner(ownerId);
         return ResponseEntity.ok(bookingList);
     }
 
@@ -58,6 +72,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingList);
     }
 
+    @PreAuthorize("hasAuthority('CUSTOMER')")
     @PutMapping("/{id}")
     public ResponseEntity<String> updateBooking(
             @PathVariable("id") Long id,
@@ -75,6 +90,7 @@ public class BookingController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
     @PutMapping("/{id}/status-update")
     public ResponseEntity<String> updateStatus(
             @PathVariable("id") Long id,
@@ -92,4 +108,11 @@ public class BookingController {
         return ResponseEntity.ok(booking);
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
+    @GetMapping("/booking-status-list")
+    public ResponseEntity<List<String>> getBookingStatus() {
+
+        List<String> response = bookingService.getBookingStatus();
+        return ResponseEntity.ok(response);
+    }
 }

@@ -13,6 +13,7 @@ import com.markian.rentitup.Machine.MachineDto.MachineRequestDto;
 import com.markian.rentitup.Machine.MachineDto.MachineResponseDto;
 import com.markian.rentitup.Machine.MachineRepository;
 import com.markian.rentitup.Machine.MachineService;
+import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
 import com.markian.rentitup.User.UserRepository;
 import org.springframework.stereotype.Service;
@@ -80,8 +81,12 @@ public class MachineServiceImpl implements MachineService {
             Category category = categoryRepository.findById(machineRequestDto.getCategoryId())
                     .orElseThrow(() -> new MachineException("Category not found with id: " + machineRequestDto.getCategoryId()));
 
-            User user =  userRepository.findById(machineRequestDto.getOwnerId())
-                    .orElseThrow(()-> new UserException("Owner of id not found"));
+            User user = userRepository.findById(machineRequestDto.getOwnerId())
+                    .orElseThrow(() -> new UserException("Owner of id not found"));
+
+            if (user.getRole() != Role.OWNER) {
+                throw new MachineException("user is not owner ");
+            }
 
             Machine machine = machineMapper.toEntity(machineRequestDto);
             machine.setCategory(category);
@@ -94,8 +99,7 @@ public class MachineServiceImpl implements MachineService {
 
         } catch (MachineException e) {
             throw e;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new MachineException("Error while creating a machine " + e.getMessage(), e);
         }
     }
@@ -228,7 +232,7 @@ public class MachineServiceImpl implements MachineService {
                     .toList();
         } catch (MachineException e) {
             throw e;
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new MachineException("Error getting machines with the names " + e.getMessage(), e);
         }
     }
@@ -239,12 +243,16 @@ public class MachineServiceImpl implements MachineService {
             User user = userRepository.findById(ownerId).orElseThrow(
                     () -> new UserException("User with the id " + ownerId + " not found ")
             );
+
+            if (user.getRole() != Role.OWNER) {
+                throw new MachineException("user is not owner ");
+            }
             List<Machine> machines = machineRepository.findAllByOwnerId(ownerId);
             return machines.stream()
                     .map(machineMapper::toListResponseDto)
                     .toList();
-        } catch (UserException e) {
-            throw new UserException("Error getting the user" + e.getMessage(), e);
+        } catch (UserException | MachineException e) {
+            throw e;
         } catch (Exception e) {
             throw new MachineException("Error getting machines by the owner " + e.getMessage(), e);
         }

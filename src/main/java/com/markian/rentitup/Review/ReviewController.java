@@ -18,7 +18,7 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
-    @GetMapping("/reviews/{machineId}")
+    @GetMapping("/reviews/machine/{machineId}")
     public ResponseEntity<List<ReviewResponseDto>> getReviewsByMachine(
             @PathVariable Long machineId
     ) {

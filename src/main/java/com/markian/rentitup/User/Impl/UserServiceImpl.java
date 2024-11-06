@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService {
 
             AuthResponse authResponse = new AuthResponse();
             authResponse.setToken(token);
-            authResponse.setUserDetails(user);
+            authResponse.setRole(user.getRole().name());;
             return authResponse;
         } catch (UserException e) {
             throw e;
