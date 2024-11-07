@@ -19,7 +19,7 @@ public class MachineRequestDto {
     private BigDecimal basePrice;
 
     @NotNull
-    private MachineCondition condition;
+    private String condition;
 
     private String specification;
 

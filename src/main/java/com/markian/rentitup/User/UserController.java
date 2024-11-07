@@ -5,6 +5,8 @@ import com.markian.rentitup.User.UserDto.UserRequestDto;
 import com.markian.rentitup.User.UserDto.UserResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,6 +38,16 @@ public class UserController {
         return ResponseEntity.ok(userListResponseDtoList);
     }
 
+
+    @GetMapping("/user-profile")
+    public ResponseEntity<UserResponseDto> getLoggedInUserProfile() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        UserResponseDto userResponseDto= userService.getLoggedInUserInfo(email);
+        return ResponseEntity.ok(userResponseDto);
+
+    }
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable("id") Long id) {
         UserResponseDto userResponseDto = userService.getUserById(id);

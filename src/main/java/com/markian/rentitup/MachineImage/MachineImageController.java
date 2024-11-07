@@ -57,6 +57,7 @@ public class MachineImageController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
     @PutMapping("/{imageId}/primary")
     public ResponseEntity<String> setIsPrimary (
             @PathVariable Long machineId,

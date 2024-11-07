@@ -43,6 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponseDto createCategory(CategoryRequestDto categoryRequestDto) throws CategoryException {
         try {
+
             if (categoryRepository.existsByName(categoryRequestDto.getName())) {
                 throw new CategoryException("The category already exists");
             }

@@ -1,6 +1,7 @@
 package com.markian.rentitup.Machine.MachineDto;
 
 import com.markian.rentitup.Machine.Machine;
+import com.markian.rentitup.Machine.MachineCondition;
 import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
 import lombok.Data;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 
 @Service
-public class MachineMapperImpl  implements  MachineMapper{
+public class MachineMapperImpl implements MachineMapper {
 
 
     @Data
@@ -28,7 +29,7 @@ public class MachineMapperImpl  implements  MachineMapper{
         machine.setDescription(dto.getDescription());
         machine.setBasePrice(dto.getBasePrice());
         machine.setSpecification(dto.getSpecification());
-        machine.setCondition(dto.getCondition());
+        machine.setCondition(MachineCondition.valueOf(dto.getCondition()));
         return machine;
     }
 
@@ -41,10 +42,12 @@ public class MachineMapperImpl  implements  MachineMapper{
         responseDto.setSpecification(machine.getSpecification());
         responseDto.setIsAvailable(machine.getIsAvailable());
         responseDto.setCondition(machine.getCondition());
-        responseDto.setOwner(toSimpleUserDto( machine.getOwner()));
+        responseDto.setOwner(toSimpleUserDto(machine.getOwner()));
+        responseDto.setMachineImages(machine.getMachineImages());
         if (machine.getCategory() != null) {
             responseDto.setCategoryId(machine.getCategory().getId());
         }
+
         return responseDto;
     }
 

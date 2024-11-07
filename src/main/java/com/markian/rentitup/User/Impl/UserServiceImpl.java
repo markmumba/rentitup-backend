@@ -73,6 +73,7 @@ public class UserServiceImpl implements UserService {
             var token = jwtTokenUtil.generateToken(user);
 
             AuthResponse authResponse = new AuthResponse();
+
             authResponse.setToken(token);
             authResponse.setRole(user.getRole().name());;
             return authResponse;
@@ -120,8 +121,17 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserResponseDto getOwnerInfo(Long id) throws UserException {
-        return null;
+    public UserResponseDto getLoggedInUserInfo(String email) throws UserException {
+        try {
+            User user = userRepository.findByEmail(email).orElseThrow(
+                    () -> new UserException("No user with the email " + email)
+            );
+            return userMapper.toResponseDto(user);
+        } catch (UserException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new UserException("Unable to get user information " + e.getMessage(), e);
+        }
     }
 
     @Override

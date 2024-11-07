@@ -14,8 +14,7 @@ public interface UserService {
 
     List<UserListResponseDto> getAllOwners();
 
-
-    UserResponseDto getOwnerInfo(Long id) throws UserException;
+    UserResponseDto getLoggedInUserInfo(String email) throws UserException;
 
     UserResponseDto getUserById(Long id) throws UserException;
 

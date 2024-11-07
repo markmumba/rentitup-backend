@@ -22,6 +22,6 @@ public class CategoryRequestDto {
     private String description;
 
     @NotNull(message = "Price calculation type is required")
-    private PriceCalculationType priceCalculationType;
+    private String priceCalculationType;
 }
 
