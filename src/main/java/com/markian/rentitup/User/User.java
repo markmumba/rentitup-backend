@@ -7,8 +7,12 @@ import com.markian.rentitup.Review.Review;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -16,7 +20,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity(name = "user_table")
 
-public class User  extends BaseEntity {
+public class User extends BaseEntity implements UserDetails {
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -42,10 +46,33 @@ public class User  extends BaseEntity {
     private List<Review> reviews;
 
 
-    public enum Role{
-        OWNER,
-        CUSTOMER,
-        ADMIN
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

@@ -30,4 +30,5 @@ public interface MachineService {
 
     List<MachineListResponseDto> getAllBySearch(String nameOfMachine);
 
+    List<MachineListResponseDto> getAllByOwner(Long ownerId);
 }

@@ -1,6 +1,7 @@
 package com.markian.rentitup.Category.Dto;
 
 import com.markian.rentitup.Category.Category;
+import com.markian.rentitup.Category.PriceCalculationType;
 import com.markian.rentitup.Machine.MachineDto.MachineMapper;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class CategoryMapper {
                 category.getPriceCalculationType(),
                 category.getMachines() != null ? category.getMachines().stream()
                         .map(machineMapper::toResponseDto)
-                        .collect(Collectors.toList())
+                        .toList()
                         : null
         );
     }
@@ -39,7 +40,7 @@ public class CategoryMapper {
         Category category = new Category();
         category.setName(dto.getName());
         category.setDescription(dto.getDescription());
-        category.setPriceCalculationType(dto.getPriceCalculationType());
+        category.setPriceCalculationType(PriceCalculationType.valueOf(dto.getPriceCalculationType()));
         return category;
     }
 }

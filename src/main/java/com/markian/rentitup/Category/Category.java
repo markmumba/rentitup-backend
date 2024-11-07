@@ -23,10 +23,5 @@ public class Category  extends BaseEntity {
 
     private PriceCalculationType priceCalculationType;
 
-    public enum PriceCalculationType {
-        HOURLY,
-        DAILY,
-        DISTANCE_BASED
-    }
 
 }

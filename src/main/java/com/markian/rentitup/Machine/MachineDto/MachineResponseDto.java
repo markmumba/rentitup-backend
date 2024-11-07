@@ -3,6 +3,9 @@ package com.markian.rentitup.Machine.MachineDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.markian.rentitup.Machine.MachineAvailability;
 import com.markian.rentitup.Machine.MachineCondition;
+import com.markian.rentitup.MachineImage.MachineImage;
+import com.markian.rentitup.User.User;
+import com.markian.rentitup.User.UserDto.UserResponseDto;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,7 +30,7 @@ public class MachineResponseDto {
 
     private Boolean isAvailable;
 
-    //private Long ownerId;
+    private MachineMapperImpl.UserSimpleDto owner;
 
     private Long categoryId;
 
@@ -35,7 +38,7 @@ public class MachineResponseDto {
 
     //private List<MaintenanceRecordDto> maintenanceRecords;
 
-    //private List<MachineImageDto> machineImages;
+    private List<MachineImage> machineImages;
 
 
 }

@@ -4,6 +4,7 @@ import com.markian.rentitup.Category.Category;
 import com.markian.rentitup.Category.CategoryRepository;
 import com.markian.rentitup.Exceptions.CategoryException;
 import com.markian.rentitup.Exceptions.MachineException;
+import com.markian.rentitup.Exceptions.UserException;
 import com.markian.rentitup.Machine.Machine;
 import com.markian.rentitup.Machine.MachineCondition;
 import com.markian.rentitup.Machine.MachineDto.MachineListResponseDto;
@@ -12,6 +13,9 @@ import com.markian.rentitup.Machine.MachineDto.MachineRequestDto;
 import com.markian.rentitup.Machine.MachineDto.MachineResponseDto;
 import com.markian.rentitup.Machine.MachineRepository;
 import com.markian.rentitup.Machine.MachineService;
+import com.markian.rentitup.User.Role;
+import com.markian.rentitup.User.User;
+import com.markian.rentitup.User.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -21,11 +25,13 @@ import java.util.List;
 public class MachineServiceImpl implements MachineService {
 
     private final MachineRepository machineRepository;
+    private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final MachineMapper machineMapper;
 
-    public MachineServiceImpl(MachineRepository machineRepository, CategoryRepository categoryRepository, MachineMapper machineMapper) {
+    public MachineServiceImpl(MachineRepository machineRepository, UserRepository userRepository, CategoryRepository categoryRepository, MachineMapper machineMapper) {
         this.machineRepository = machineRepository;
+        this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.machineMapper = machineMapper;
     }
@@ -48,7 +54,9 @@ public class MachineServiceImpl implements MachineService {
             return machineMapper.toResponseDto(machine);
 
         } catch (MachineException e) {
-            throw new MachineException("Error occurred while fetching machine by id ", e);
+            throw e;
+        } catch (Exception e) {
+            throw new MachineException("Error getting machine by id" + e.getMessage(), e);
         }
     }
 
@@ -62,22 +70,27 @@ public class MachineServiceImpl implements MachineService {
             machineRepository.save(machine);
             return "Availability changed to " + machine.getIsAvailable();
 
-        } catch (MachineException e) {
-            throw new MachineException("unable to change availability", e);
+        } catch (Exception e) {
+            throw new MachineException("unable to change availability " + e.getMessage(), e);
         }
     }
 
     @Override
     public MachineResponseDto createMachine(MachineRequestDto machineRequestDto) {
         try {
-
-
             Category category = categoryRepository.findById(machineRequestDto.getCategoryId())
                     .orElseThrow(() -> new MachineException("Category not found with id: " + machineRequestDto.getCategoryId()));
 
+            User user = userRepository.findById(machineRequestDto.getOwnerId())
+                    .orElseThrow(() -> new UserException("Owner of id not found"));
+
+            if (user.getRole() != Role.OWNER) {
+                throw new MachineException("user is not owner ");
+            }
 
             Machine machine = machineMapper.toEntity(machineRequestDto);
             machine.setCategory(category);
+            machine.setOwner(user);
             machine.setIsAvailable(true);
 
             return machineMapper.toResponseDto(
@@ -85,7 +98,9 @@ public class MachineServiceImpl implements MachineService {
             );
 
         } catch (MachineException e) {
-            throw new MachineException("Error while creating a machine", e);
+            throw e;
+        } catch (Exception e) {
+            throw new MachineException("Error while creating a machine " + e.getMessage(), e);
         }
     }
 
@@ -107,7 +122,9 @@ public class MachineServiceImpl implements MachineService {
             machineRepository.save(machine);
             return "Machine updated successfully";
         } catch (MachineException e) {
-            throw new MachineException("Error while updating the machine", e);
+            throw e;
+        } catch (Exception e) {
+            throw new MachineException("Error while updating the machine " + e.getMessage(), e);
         }
     }
 
@@ -121,6 +138,8 @@ public class MachineServiceImpl implements MachineService {
             return "Machine deleted successfully";
 
         } catch (MachineException e) {
+            throw e;
+        } catch (Exception e) {
             throw new MachineException("Error while deleting the machine", e);
         }
     }
@@ -212,7 +231,30 @@ public class MachineServiceImpl implements MachineService {
                     .map(machineMapper::toListResponseDto)
                     .toList();
         } catch (MachineException e) {
-            throw new MachineException("Error getting machines with the names ", e);
+            throw e;
+        } catch (Exception e) {
+            throw new MachineException("Error getting machines with the names " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<MachineListResponseDto> getAllByOwner(Long ownerId) {
+        try {
+            User user = userRepository.findById(ownerId).orElseThrow(
+                    () -> new UserException("User with the id " + ownerId + " not found ")
+            );
+
+            if (user.getRole() != Role.OWNER) {
+                throw new MachineException("user is not owner ");
+            }
+            List<Machine> machines = machineRepository.findAllByOwnerId(ownerId);
+            return machines.stream()
+                    .map(machineMapper::toListResponseDto)
+                    .toList();
+        } catch (UserException | MachineException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MachineException("Error getting machines by the owner " + e.getMessage(), e);
         }
     }
 }

@@ -4,6 +4,7 @@ import com.markian.rentitup.Machine.MachineDto.MachineListResponseDto;
 import com.markian.rentitup.Machine.MachineDto.MachineRequestDto;
 import com.markian.rentitup.Machine.MachineDto.MachineResponseDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,12 +21,21 @@ public class MachineController {
         this.machineService = machineService;
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public ResponseEntity<List<MachineListResponseDto>> getAllMachines() {
         List<MachineListResponseDto> machineListResponseDtoList =
                 machineService.getAllMachines();
         return ResponseEntity.ok(machineListResponseDtoList);
     }
+
+    @GetMapping("/owner/{ownerId}")
+    public ResponseEntity<List<MachineListResponseDto>> getAllByOwner(@PathVariable Long ownerId) {
+        List<MachineListResponseDto> machineListResponseDtoList = machineService.getAllByOwner(ownerId);
+        return ResponseEntity.ok(machineListResponseDtoList);
+    }
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<MachineResponseDto> getMachineById(@PathVariable Long id) {
@@ -34,6 +44,7 @@ public class MachineController {
         return ResponseEntity.ok(machineResponseDto);
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
     @PostMapping
     public ResponseEntity<MachineResponseDto> createMachine(
             @RequestBody MachineRequestDto machineRequestDto
@@ -42,6 +53,7 @@ public class MachineController {
         return ResponseEntity.ok(machineResponseDto);
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
     @PostMapping("{id}/change-availability")
     public ResponseEntity<String> changeAvailability(@PathVariable Long id) {
         String response = machineService.changeAvailability(id);
@@ -82,6 +94,7 @@ public class MachineController {
         return ResponseEntity.ok(machineListResponseDtoList);
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
     @PutMapping("/{id}")
     public ResponseEntity<String> updateMachine(
             @PathVariable("id") Long id,
@@ -91,6 +104,7 @@ public class MachineController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteMachine (
             @PathVariable("id") Long id
