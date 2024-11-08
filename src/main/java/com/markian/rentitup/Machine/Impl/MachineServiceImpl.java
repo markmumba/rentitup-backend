@@ -107,6 +107,13 @@ public class MachineServiceImpl implements MachineService {
     @Override
     public String updateMachine(Long id, MachineRequestDto machineRequestDto) throws MachineException {
         try {
+            MachineCondition machineCondition;
+            try {
+                machineCondition = MachineCondition.valueOf(machineRequestDto.getCondition());
+
+            } catch (IllegalArgumentException e) {
+                throw new MachineException("Invalid condition" ,e);
+            }
             Machine machine = machineRepository.findById(id).orElseThrow(
                     () -> new MachineException("Could not find machine of id " + id)
             );
@@ -116,9 +123,10 @@ public class MachineServiceImpl implements MachineService {
             machine.setName(machineRequestDto.getName());
             machine.setDescription(machineRequestDto.getDescription());
             machine.setBasePrice(machineRequestDto.getBasePrice());
-            machine.setCondition(machineRequestDto.getCondition());
+            machine.setCondition(machineCondition);
             machine.setSpecification(machineRequestDto.getSpecification());
             machine.setCategory(category);
+
             machineRepository.save(machine);
             return "Machine updated successfully";
         } catch (MachineException e) {

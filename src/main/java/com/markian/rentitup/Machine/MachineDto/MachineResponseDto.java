@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.markian.rentitup.Machine.MachineAvailability;
 import com.markian.rentitup.Machine.MachineCondition;
 import com.markian.rentitup.MachineImage.MachineImage;
+import com.markian.rentitup.MachineImage.MachineImageDto.MachineImageResponseDto;
 import com.markian.rentitup.User.User;
 import com.markian.rentitup.User.UserDto.UserResponseDto;
 import lombok.Data;
@@ -38,7 +39,7 @@ public class MachineResponseDto {
 
     //private List<MaintenanceRecordDto> maintenanceRecords;
 
-    private List<MachineImage> machineImages;
+    private List<MachineMapperImpl.MachineImageDto> machineImages;
 
 
 }

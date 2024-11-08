@@ -2,6 +2,7 @@ package com.markian.rentitup.Machine.MachineDto;
 
 import com.markian.rentitup.Machine.Machine;
 import com.markian.rentitup.Machine.MachineCondition;
+import com.markian.rentitup.MachineImage.MachineImage;
 import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
 import lombok.Data;
@@ -23,6 +24,20 @@ public class MachineMapperImpl implements MachineMapper {
         private LocalDate verifiedAt;
     }
 
+    @Data
+    public static class MachineImageDto {
+        private Long id;
+        private String url;
+        private Boolean isPrimary;
+    }
+
+    public MachineImageDto fromEntity(MachineImage machineImage) {
+       MachineImageDto responseDto = new MachineImageDto();
+        responseDto.setId(machineImage.getId());
+        responseDto.setUrl(machineImage.getUrl());
+        responseDto.setIsPrimary(machineImage.getIsPrimary());
+        return responseDto;
+    }
     public Machine toEntity(MachineRequestDto dto) {
         Machine machine = new Machine();
         machine.setName(dto.getName());
@@ -43,7 +58,11 @@ public class MachineMapperImpl implements MachineMapper {
         responseDto.setIsAvailable(machine.getIsAvailable());
         responseDto.setCondition(machine.getCondition());
         responseDto.setOwner(toSimpleUserDto(machine.getOwner()));
-        responseDto.setMachineImages(machine.getMachineImages());
+        responseDto.setMachineImages(
+                machine.getMachineImages().stream()
+                        .map(this::fromEntity)
+                        .toList()
+        );
         if (machine.getCategory() != null) {
             responseDto.setCategoryId(machine.getCategory().getId());
         }
@@ -58,6 +77,14 @@ public class MachineMapperImpl implements MachineMapper {
         responseDto.setBasePrice(machine.getBasePrice());
         responseDto.setIsAvailable(machine.getIsAvailable());
         responseDto.setCondition(machine.getCondition());
+        responseDto.setDescription(machine.getDescription());
+        responseDto.setMachineImageUrl(machine.getMachineImages()
+                .stream()
+                .filter(MachineImage::getIsPrimary)
+                .map(MachineImage::getUrl)
+                .findFirst()
+                .orElse(null));
+
 
         if (machine.getCategory() != null) {
             responseDto.setCategoryId(machine.getCategory().getId());

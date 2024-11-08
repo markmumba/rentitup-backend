@@ -87,11 +87,18 @@ public class CategoryServiceImpl implements CategoryService {
     public String updateCategory(Long id, CategoryRequestDto categoryRequestDto) throws CategoryException {
 
         try {
+            PriceCalculationType priceCalculationType;
+            try {
+                priceCalculationType = PriceCalculationType.valueOf(categoryRequestDto.getPriceCalculationType());
+
+            } catch (IllegalArgumentException e) {
+                throw new CategoryException("Invalid price type", e);
+            }
             Category category = categoryRepository.findById(id)
                     .orElseThrow(() -> new CategoryException("could not find category by  " + id));
             category.setName(categoryRequestDto.getName());
             category.setDescription(categoryRequestDto.getDescription());
-            category.setPriceCalculationType(categoryRequestDto.getPriceCalculationType());
+            category.setPriceCalculationType(priceCalculationType);
             categoryRepository.save(category);
 
             return "Category updated successful";

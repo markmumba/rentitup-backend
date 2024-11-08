@@ -23,7 +23,7 @@ public class CategoryMapper {
                 category.getDescription(),
                 category.getPriceCalculationType(),
                 category.getMachines() != null ? category.getMachines().stream()
-                        .map(machineMapper::toResponseDto)
+                        .map(machineMapper::toListResponseDto)
                         .toList()
                         : null
         );
@@ -32,7 +32,8 @@ public class CategoryMapper {
     public CategoryListResponse toCategoryListResponseDto(Category category) {
         return new CategoryListResponse(
                 category.getId(),
-                category.getName()
+                category.getName(),
+                category.getDescription()
         );
     }
 

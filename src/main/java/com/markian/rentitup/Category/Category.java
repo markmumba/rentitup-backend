@@ -19,7 +19,8 @@ public class Category  extends BaseEntity {
     @OneToMany(mappedBy = "category" ,cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<Machine> machines;
 
-    private String Description;
+    @Column(length = 700)
+    private String description;
 
     private PriceCalculationType priceCalculationType;
 
