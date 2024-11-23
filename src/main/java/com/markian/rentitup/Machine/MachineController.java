@@ -112,5 +112,10 @@ public class MachineController {
         String response = machineService.deleteMachine(id);
         return ResponseEntity.ok(response);
     }
-
+    @PreAuthorize("hasAuthority('OWNER')")
+    @GetMapping("/machineConditions")
+    public ResponseEntity<List<String>> getMachineConditions() {
+        List<String> machineConditions = machineService.getMachineCondition();
+        return ResponseEntity.ok(machineConditions);
+    }
 }

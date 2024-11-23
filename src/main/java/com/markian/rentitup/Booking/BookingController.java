@@ -100,6 +100,14 @@ public class BookingController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/machine/{machineId}")
+    public ResponseEntity<List<BookingListResponseDto>> getBookingsByMachine(
+            @PathVariable("machineId") Long machineId
+    ) {
+        List<BookingListResponseDto> bookingListResponseDtos = bookingService.getBookingsByMachine(machineId);
+        return ResponseEntity.ok(bookingListResponseDtos);
+    }
+
     @GetMapping("/get-by-code")
     public ResponseEntity<BookingResponseDto> getBookingByCode(
             @RequestParam(name = "code") String bookingCode

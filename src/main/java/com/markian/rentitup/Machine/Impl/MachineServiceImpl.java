@@ -1,5 +1,7 @@
 package com.markian.rentitup.Machine.Impl;
 
+import com.markian.rentitup.Booking.Booking;
+import com.markian.rentitup.Booking.BookingStatus;
 import com.markian.rentitup.Category.Category;
 import com.markian.rentitup.Category.CategoryRepository;
 import com.markian.rentitup.Exceptions.CategoryException;
@@ -13,11 +15,19 @@ import com.markian.rentitup.Machine.MachineDto.MachineRequestDto;
 import com.markian.rentitup.Machine.MachineDto.MachineResponseDto;
 import com.markian.rentitup.Machine.MachineRepository;
 import com.markian.rentitup.Machine.MachineService;
+import com.markian.rentitup.MachineImage.AwsS3Service;
+import com.markian.rentitup.MachineImage.MachineImage;
+import com.markian.rentitup.Review.Review;
 import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
 import com.markian.rentitup.User.UserRepository;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,12 +38,15 @@ public class MachineServiceImpl implements MachineService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final MachineMapper machineMapper;
+    private final AwsS3Service awsS3Service;
+    private final Logger logger = LoggerFactory.getLogger(MachineServiceImpl.class);
 
-    public MachineServiceImpl(MachineRepository machineRepository, UserRepository userRepository, CategoryRepository categoryRepository, MachineMapper machineMapper) {
+    public MachineServiceImpl(MachineRepository machineRepository, UserRepository userRepository, CategoryRepository categoryRepository, MachineMapper machineMapper, AwsS3Service awsS3Service) {
         this.machineRepository = machineRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.machineMapper = machineMapper;
+        this.awsS3Service = awsS3Service;
     }
 
 
@@ -47,10 +60,10 @@ public class MachineServiceImpl implements MachineService {
 
     @Override
     public MachineResponseDto getMachineId(Long id) throws MachineException {
-        Machine machine = machineRepository.findById(id).orElseThrow(
-                () -> new MachineException("Could not find machine by id: " + id)
-        );
         try {
+            Machine machine = machineRepository.findById(id).orElseThrow(
+                    () -> new MachineException("Could not find machine by id: " + id)
+            );
             return machineMapper.toResponseDto(machine);
 
         } catch (MachineException e) {
@@ -112,7 +125,7 @@ public class MachineServiceImpl implements MachineService {
                 machineCondition = MachineCondition.valueOf(machineRequestDto.getCondition());
 
             } catch (IllegalArgumentException e) {
-                throw new MachineException("Invalid condition" ,e);
+                throw new MachineException("Invalid condition", e);
             }
             Machine machine = machineRepository.findById(id).orElseThrow(
                     () -> new MachineException("Could not find machine of id " + id)
@@ -137,20 +150,20 @@ public class MachineServiceImpl implements MachineService {
     }
 
     @Override
+    @Transactional
     public String deleteMachine(Long id) throws MachineException {
         try {
-            Machine machine = machineRepository.findById(id).orElseThrow(
-                    () -> new MachineException("Could not find machine of id " + id)
-            );
+            Machine machine = machineRepository.findById(id)
+                    .orElseThrow(() -> new MachineException("Machine not found with id: " + id));
             machineRepository.delete(machine);
             return "Machine deleted successfully";
-
         } catch (MachineException e) {
             throw e;
         } catch (Exception e) {
-            throw new MachineException("Error while deleting the machine", e);
+            throw new MachineException("Error while deleting the machine: " + e.getMessage(), e);
         }
     }
+
 
     @Override
     public List<MachineListResponseDto> getAllByCategory(Long categoryId) {
@@ -264,6 +277,15 @@ public class MachineServiceImpl implements MachineService {
         } catch (Exception e) {
             throw new MachineException("Error getting machines by the owner " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public List<String> getMachineCondition() {
+        return Arrays.asList(
+                MachineCondition.EXCELLENT.name(),
+                MachineCondition.GOOD.name(),
+                MachineCondition.FAIR.name()
+        );
     }
 }
 

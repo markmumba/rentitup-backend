@@ -22,4 +22,6 @@ public interface UserService {
 
     String deleteUser(Long id) throws UserException;
 
+    boolean verifyUser(Long id) throws UserException;
+
 }

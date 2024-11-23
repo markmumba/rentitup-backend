@@ -190,4 +190,9 @@ public class UserServiceImpl implements UserService {
             throw new UserException("Error occurred when deleting user" + e.getMessage(), e);
         }
     }
+
+    @Override
+    public boolean verifyUser(Long id) throws UserException {
+        return false;
+    }
 }

@@ -1,6 +1,7 @@
 package com.markian.rentitup.Booking.BookingDto;
 
 import com.markian.rentitup.Booking.Booking;
+import com.markian.rentitup.MachineImage.MachineImage;
 import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
 import lombok.Data;
@@ -14,6 +15,7 @@ public class BookingMapper {
     public static class MachineSimpleResponseDto {
         private Long id;
         private String name;
+        private String imageUrl;
         private String specification;
         private UserSimpleResponseDto owner;
         // other fields as needed
@@ -42,6 +44,15 @@ public class BookingMapper {
             machineDto.setId(booking.getMachine().getId());
             machineDto.setName(booking.getMachine().getName());
             machineDto.setSpecification(booking.getMachine().getSpecification());
+            machineDto.setImageUrl(
+                    booking.getMachine().getMachineImages()
+                            .stream()
+                            .filter(MachineImage::getIsPrimary)
+                            .map(MachineImage::getUrl)
+                            .findFirst()
+                            .orElse(null)
+            )       ;
+
 
             UserSimpleResponseDto ownerDto = new UserSimpleResponseDto();
             ownerDto.setId(booking.getMachine().getOwner().getId());

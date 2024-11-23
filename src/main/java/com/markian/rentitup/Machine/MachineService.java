@@ -16,7 +16,7 @@ public interface MachineService {
 
     String changeAvailability(Long id) throws MachineException;
 
-    MachineResponseDto createMachine(MachineRequestDto machineRequestDto) ;
+    MachineResponseDto createMachine(MachineRequestDto machineRequestDto);
 
     String updateMachine(Long id, MachineRequestDto machineRequestDto) throws MachineException;
 
@@ -24,11 +24,13 @@ public interface MachineService {
 
     List<MachineListResponseDto> getAllByCategory(Long categoryId) throws CategoryException;
 
-    List<MachineListResponseDto> getAllByCondition(Long categoryId,String condition);
+    List<MachineListResponseDto> getAllByCondition(Long categoryId, String condition);
 
     List<MachineListResponseDto> getAllByAvailability(Long categoryId);
 
     List<MachineListResponseDto> getAllBySearch(String nameOfMachine);
 
     List<MachineListResponseDto> getAllByOwner(Long ownerId);
+
+    List<String> getMachineCondition();
 }

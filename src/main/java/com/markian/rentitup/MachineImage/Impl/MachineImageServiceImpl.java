@@ -126,9 +126,7 @@ public class MachineImageServiceImpl implements MachineImageService {
                 .orElseThrow(() -> new MachineImageException(
                         String.format("Image with id %d not found for machine %d", imageId, machineId)
                 ));
-        if (machineImage.getIsPrimary()) {
-            throw new MachineImageException("You cannot delete the primary image ");
-        }
+
         try {
             awsS3Service.deleteImageFromS3(machineImage.getUrl());
             machineImageRepository.delete(machineImage);

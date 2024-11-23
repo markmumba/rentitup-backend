@@ -187,6 +187,19 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public List<BookingListResponseDto> getBookingsByMachine(Long machineId) {
+        try{
+            return bookingRepository.findAllByMachineId(machineId)
+                    .stream()
+                    .map(bookingMapper::toListDto)
+                    .toList();
+
+        } catch (Exception e) {
+            throw new MachineException("Cannot get bookings for machine " + e.getMessage(),e);
+        }
+    }
+
+    @Override
     public String updateBooking(Long id, BookingRequestDto bookingRequestDto) throws BookingException {
         try {
             Booking booking = bookingRepository.findById(id)
@@ -221,7 +234,7 @@ public class BookingServiceImpl implements BookingService {
                     .orElseThrow(() -> new BookingException("Booking with id " + id + " not found"));
 
             booking.setStatus(BookingStatus.CANCELLED);
-            bookingRepository.delete(booking);
+            bookingRepository.deleteById(id);
             return "Booking deleted successfully";
         } catch (Exception e) {
             throw new BookingException("Unable to delete booking " + e.getMessage(), e);

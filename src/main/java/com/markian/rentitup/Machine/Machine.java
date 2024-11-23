@@ -34,7 +34,7 @@ public class Machine extends BaseEntity {
 
     private Boolean isAvailable;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
 
@@ -42,13 +42,12 @@ public class Machine extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-
-    @OneToMany(mappedBy = "machine")
+    @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings;
 
-    @OneToMany(mappedBy = "machine")
+    @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MaintenanceRecord> maintainanceRecords;
 
-    @OneToMany(mappedBy = "machine")
+    @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MachineImage> machineImages;
 }

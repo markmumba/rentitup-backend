@@ -32,12 +32,13 @@ public class MachineMapperImpl implements MachineMapper {
     }
 
     public MachineImageDto fromEntity(MachineImage machineImage) {
-       MachineImageDto responseDto = new MachineImageDto();
+        MachineImageDto responseDto = new MachineImageDto();
         responseDto.setId(machineImage.getId());
         responseDto.setUrl(machineImage.getUrl());
         responseDto.setIsPrimary(machineImage.getIsPrimary());
         return responseDto;
     }
+
     public Machine toEntity(MachineRequestDto dto) {
         Machine machine = new Machine();
         machine.setName(dto.getName());
@@ -57,12 +58,16 @@ public class MachineMapperImpl implements MachineMapper {
         responseDto.setSpecification(machine.getSpecification());
         responseDto.setIsAvailable(machine.getIsAvailable());
         responseDto.setCondition(machine.getCondition());
-        responseDto.setOwner(toSimpleUserDto(machine.getOwner()));
-        responseDto.setMachineImages(
-                machine.getMachineImages().stream()
-                        .map(this::fromEntity)
-                        .toList()
-        );
+        if (machine.getOwner() != null) {
+            responseDto.setOwner(toSimpleUserDto(machine.getOwner()));
+        }
+        if (machine.getMachineImages() != null) {
+            responseDto.setMachineImages(
+                    machine.getMachineImages().stream()
+                            .map(this::fromEntity)
+                            .toList()
+            );
+        }
         if (machine.getCategory() != null) {
             responseDto.setCategoryId(machine.getCategory().getId());
         }
