@@ -30,6 +30,7 @@ public class Machine extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MachineCondition condition;
 
+    @Column(length = 700)
     private String specification;
 
     private Boolean isAvailable;

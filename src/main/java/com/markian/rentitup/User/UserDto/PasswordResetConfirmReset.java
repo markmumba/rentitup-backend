@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AuthResponse {
+public class PasswordResetConfirmReset {
     private String token;
-    private String role;
+    private String newPassword;
 }
