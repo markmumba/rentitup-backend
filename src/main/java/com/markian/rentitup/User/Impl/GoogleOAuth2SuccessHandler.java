@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -22,8 +23,11 @@ public class GoogleOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     private final UserService userService;
     private final JwtTokenUtil jwtTokenUtil;
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     @Autowired
-    public GoogleOAuth2SuccessHandler( @Lazy  UserService userService, JwtTokenUtil jwtTokenUtil) {
+    public GoogleOAuth2SuccessHandler(@Lazy UserService userService, JwtTokenUtil jwtTokenUtil) {
         this.userService = userService;
         this.jwtTokenUtil = jwtTokenUtil;
     }
@@ -44,7 +48,7 @@ public class GoogleOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         String token = jwtTokenUtil.generateToken(user);
 
         // Redirect to frontend with token
-        String redirectUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/oauth-redirect")
+        String redirectUrl = UriComponentsBuilder.fromUriString(frontendUrl + "/oauth-redirect")
                 .queryParam("token", token)
                 .queryParam("role", user.getRole())
                 .build().toUriString();

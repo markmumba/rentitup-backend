@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class VerifyCollectorRequest {
+public class VerifyOwnerRequest {
     private Long id;
     private boolean status;
 }

@@ -1,7 +1,5 @@
 package com.markian.rentitup.Machine.Impl;
 
-import com.markian.rentitup.Booking.Booking;
-import com.markian.rentitup.Booking.BookingStatus;
 import com.markian.rentitup.Category.Category;
 import com.markian.rentitup.Category.CategoryRepository;
 import com.markian.rentitup.Exceptions.CategoryException;
@@ -15,12 +13,10 @@ import com.markian.rentitup.Machine.MachineDto.MachineRequestDto;
 import com.markian.rentitup.Machine.MachineDto.MachineResponseDto;
 import com.markian.rentitup.Machine.MachineRepository;
 import com.markian.rentitup.Machine.MachineService;
-import com.markian.rentitup.MachineImage.AwsS3Service;
-import com.markian.rentitup.MachineImage.MachineImage;
-import com.markian.rentitup.Review.Review;
 import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
 import com.markian.rentitup.User.UserRepository;
+import com.markian.rentitup.Utils.AwsS3Service;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

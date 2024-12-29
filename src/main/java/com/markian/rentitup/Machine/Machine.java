@@ -21,6 +21,8 @@ public class Machine extends BaseEntity {
 
     private String description;
 
+    private Boolean verified = false;
+
     @Column(nullable = false)
     private BigDecimal basePrice;
 

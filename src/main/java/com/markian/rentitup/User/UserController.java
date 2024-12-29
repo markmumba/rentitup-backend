@@ -3,7 +3,7 @@ package com.markian.rentitup.User;
 import com.markian.rentitup.User.UserDto.UserListResponseDto;
 import com.markian.rentitup.User.UserDto.UserRequestDto;
 import com.markian.rentitup.User.UserDto.UserResponseDto;
-import com.markian.rentitup.User.UserDto.VerifyCollectorRequest;
+import com.markian.rentitup.User.UserDto.VerifyOwnerRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -66,16 +66,16 @@ public class UserController {
     @GetMapping("/unverified-users")
     public ResponseEntity<List<UserListResponseDto>> getUnverifiedUsers(
     ) {
-        List<UserListResponseDto> users = userService.getUnverifiedCollectors();
+        List<UserListResponseDto> users = userService.getUnverifiedOwners();
         return ResponseEntity.ok(users);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/verify-collector")
-    public ResponseEntity<String> verifyCollector(@RequestBody VerifyCollectorRequest verifyCollectorRequest,
+    public ResponseEntity<String> verifyCollector(@RequestBody VerifyOwnerRequest verifyOwnerRequest,
     @AuthenticationPrincipal User user) {
         Long id = user.getId();
-        CompletableFuture.runAsync(() -> userService.verifyCollector(verifyCollectorRequest, id));
+        CompletableFuture.runAsync(() -> userService.verifyOwner(verifyOwnerRequest, id));
         return ResponseEntity.ok("Request received. Processing in background.");
     }
 

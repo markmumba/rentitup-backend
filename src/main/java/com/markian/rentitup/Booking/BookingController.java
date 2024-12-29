@@ -27,7 +27,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingList);
     }
 
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('CUSTOMER','OWNER')")
     @PostMapping
     public ResponseEntity<BookingResponseDto> createBooking(
             @RequestBody BookingRequestDto bookingRequestDto
@@ -37,7 +37,7 @@ public class BookingController {
     }
 
 
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('CUSTOMER','OWNER')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<BookingListResponseDto>> getBookingsByUser(
             @PathVariable("userId") Long userId
@@ -72,7 +72,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingList);
     }
 
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('CUSTOMER','OWNER')")
     @PutMapping("/{id}")
     public ResponseEntity<String> updateBooking(
             @PathVariable("id") Long id,

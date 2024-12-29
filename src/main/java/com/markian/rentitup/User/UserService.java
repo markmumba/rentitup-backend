@@ -22,13 +22,13 @@ public interface UserService {
 
     UserResponseDto getUserById(Long id) throws UserException;
 
-    String verifyCollector(VerifyCollectorRequest verifyCollectorRequest, Long adminId)throws  UserException;
+    String verifyOwner(VerifyOwnerRequest verifyOwnerRequest, Long adminId)throws  UserException;
 
     Map<String, String> updateUser(Long id, UserRequestDto userRequestDto);
     String deleteUser(Long id) throws UserException;
 
     String uploadVerificationImage(String registrationId,MultipartFile photo,String nationalId) throws UserException;
 
-    List<UserListResponseDto> getUnverifiedCollectors();
+    List<UserListResponseDto> getUnverifiedOwners();
 
 }

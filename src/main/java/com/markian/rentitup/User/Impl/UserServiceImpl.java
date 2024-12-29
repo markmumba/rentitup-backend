@@ -32,6 +32,9 @@ import java.util.concurrent.CompletableFuture;
 //TODO how to update password
 //TODO Remove the private send email and use the one in utils folder
 
+
+//TODO  Get message for rejection of registration
+
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -64,7 +67,7 @@ public class UserServiceImpl implements UserService {
 
             User user = userMapper.toEntity(userRequestDto);
 
-            collectorsRegistrationSettings(user);
+            ownerRegistrationSettings(user);
 
             user.setCreatedAt(LocalDateTime.now());
             userRepository.save(user);
@@ -179,12 +182,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public String verifyCollector(VerifyCollectorRequest verifyCollectorRequest, Long adminId) throws UserException {
-        User user = findUserById(verifyCollectorRequest.getId());
+    public String verifyOwner(VerifyOwnerRequest verifyOwnerRequest, Long adminId) throws UserException {
+        User user = findUserById(verifyOwnerRequest.getId());
 
-        return verifyCollectorRequest.isStatus()
-                ? processVerifiedCollector(user, adminId)
-                : processRejectedCollector(user);
+        return verifyOwnerRequest.isStatus()
+                ? processVerifiedOwners(user, adminId)
+                : processRejectedOwners(user);
     }
 
 
@@ -273,7 +276,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserListResponseDto> getUnverifiedCollectors() {
+    public List<UserListResponseDto> getUnverifiedOwners() {
         try {
             List<User> users = userRepository.findByVerifiedFalse();
             return users.stream()
@@ -321,8 +324,8 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private void collectorsRegistrationSettings(User user) {
-        if (Role.COLLECTOR.equals(user.getRole())) {
+    private void ownerRegistrationSettings(User user) {
+        if (Role.OWNER.equals(user.getRole())) {
             String registrationId = UUID.randomUUID().toString();
             user.setVerified(false);
             user.setRegistrationId(registrationId);
@@ -346,31 +349,32 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserException("No user with the id " + id));
     }
 
-    private String processVerifiedCollector(User user, Long adminId) {
+    private String processVerifiedOwners(User user, Long adminId) {
         userRepository.verifyUser(true, LocalDateTime.now(), adminId, null, user.getId());
 
         CompletableFuture.runAsync(() ->
                 sendVerificationEmail(
                         user.getEmail(),
                         "Successfully Account Verification",
-                        "Your account has been successfully verified. You can now log in and view available jobs."
+                        "Your account has been successfully been activated you can now add the machines you want to rent out ." +
+                                "Note: The machines will also be checked carefully "
                 )
         );
 
-        return "Collector verified successfully and email sent.";
+        return "Owner  verified successfully and email sent.";
     }
 
-    private String processRejectedCollector(User user) {
+    private String processRejectedOwners(User user) {
         CompletableFuture.runAsync(() ->
                 sendVerificationEmail(
                         user.getEmail(),
                         "Account creation denied",
-                        "Your account was not accepted. Please try registering with more details."
+                        "Your account was not accepted. Please try registering with more details. or the correct details "
                 )
         );
 
         userRepository.delete(user);
-        return "Collector account not accepted and was removed.";
+        return "Owner  account not accepted and was removed.";
     }
 
 

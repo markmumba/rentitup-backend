@@ -8,7 +8,7 @@ import com.markian.rentitup.User.User;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 public class MachineMapperImpl implements MachineMapper {
@@ -21,7 +21,7 @@ public class MachineMapperImpl implements MachineMapper {
         private String fullName;
         private String phone;
         private Role role;
-        private LocalDate verifiedAt;
+        private LocalDateTime verifiedAt;
     }
 
     @Data

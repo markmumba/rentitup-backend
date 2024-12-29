@@ -1,5 +1,6 @@
 package com.markian.rentitup.User.UserDto;
 
+import com.markian.rentitup.Machine.MachineDto.MachineMapper;
 import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserMapper {
 
+    private final MachineMapper machineMapper;
+
+    public UserMapper(MachineMapper machineMapper) {
+        this.machineMapper = machineMapper;
+    }
 
     public User toEntity(UserRequestDto dto) {
         User user = new User();
@@ -32,6 +38,13 @@ public class UserMapper {
         responseDto.setVerified(user.getVerified());
         responseDto.setRegistrationId(user.getRegistrationId());
         responseDto.setVerifiedAt(user.getVerifiedAt());
+        if (user.getOwnedMachines() != null) {
+            responseDto.setOwnedMachines(
+                    user.getOwnedMachines().stream()
+                            .map(machineMapper::toResponseDto)
+                            .toList()
+            );
+        }
 
         return responseDto;
     }

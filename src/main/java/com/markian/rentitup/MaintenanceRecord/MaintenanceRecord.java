@@ -23,6 +23,8 @@ public class MaintenanceRecord extends BaseEntity {
 
     private LocalDate nextService;
 
+    private String imageRecordUrl;
+
     @ManyToOne
     @JoinColumn(name = "machine_id")
     private Machine machine;

@@ -8,6 +8,7 @@ import com.markian.rentitup.Booking.BookingDto.BookingResponseDto;
 import com.markian.rentitup.Booking.BookingRepository;
 import com.markian.rentitup.Booking.BookingService;
 import com.markian.rentitup.Booking.BookingStatus;
+import com.markian.rentitup.Config.EmailService;
 import com.markian.rentitup.Exceptions.BookingException;
 import com.markian.rentitup.Exceptions.MachineException;
 import com.markian.rentitup.Exceptions.UserException;
@@ -22,7 +23,10 @@ import org.springframework.stereotype.Service;
 import java.awt.print.Book;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -30,12 +34,14 @@ public class BookingServiceImpl implements BookingService {
     private final MachineRepository machineRepository;
     private final UserRepository userRepository;
     private final BookingMapper bookingMapper;
+    private final EmailService emailService;
 
-    public BookingServiceImpl(BookingRepository bookingRepository, MachineRepository machineRepository, UserRepository userRepository, BookingMapper bookingMapper) {
+    public BookingServiceImpl(BookingRepository bookingRepository, MachineRepository machineRepository, UserRepository userRepository, BookingMapper bookingMapper, EmailService emailService) {
         this.bookingRepository = bookingRepository;
         this.machineRepository = machineRepository;
         this.userRepository = userRepository;
         this.bookingMapper = bookingMapper;
+        this.emailService = emailService;
     }
 
     @Override
@@ -254,8 +260,30 @@ public class BookingServiceImpl implements BookingService {
             Booking booking = bookingRepository.findById(id)
                     .orElseThrow(() -> new BookingException("Booking with id " + id + " not found"));
 
+
             booking.setStatus(bookingStatus);
             bookingRepository.save(booking);
+
+            Map<String, Object> templateVariables = new HashMap<>();
+            templateVariables.put("bookingCode", booking.getBookingCode());
+            templateVariables.put("CustomerName", booking.getCustomer().getFullName());
+            templateVariables.put("startDate", booking.getStartDate());
+            templateVariables.put("endDate",booking.getEndDate());
+            templateVariables.put("bookingStatus",booking.getStatus());
+            templateVariables.put("machine",booking.getMachine().getName());
+            templateVariables.put("owner", booking.getMachine().getOwner().getFullName());
+            templateVariables.put("location",booking.getPickUpLocation());
+
+
+            CompletableFuture.runAsync(() ->
+                    emailService.sendEmail(
+                            booking.getCustomer().getEmail(),
+                            "Booking status has been updated",
+                            "booking", // template name
+                            templateVariables
+                    )
+            );
+
             return "Status updated successfully";
 
         } catch (Exception e) {
