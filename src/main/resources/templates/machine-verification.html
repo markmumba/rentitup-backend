@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Verification Status</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; background-color: #f4f4f4;">
+<table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-collapse: collapse;">
+    <!-- Header -->
+    <tr>
+        <td style="padding: 20px; background-color: #0066cc; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Machine Verification Update</h1>
+        </td>
+    </tr>
+
+    <!-- Content -->
+    <tr>
+        <td style="padding: 30px;">
+            <p style="margin-top: 0; margin-bottom: 15px;">Dear <strong th:text="${ownerName}">Owner Name</strong>,</p>
+
+            <p style="margin-bottom: 15px;">We are pleased to inform you that your machine has been reviewed and verified by our team.</p>
+
+            <div style="background-color: #f8f9fa; border-left: 4px solid #0066cc; padding: 15px; margin-bottom: 20px;">
+                <p style="margin: 0; margin-bottom: 10px;"><strong>Machine Details:</strong></p>
+                <p style="margin: 0; margin-bottom: 5px;">Name: <span th:text="${machineName}">Machine Name</span></p>
+                <p style="margin: 0; margin-bottom: 5px;">Status: <span style="color: #28a745; font-weight: bold;" th:text="${status ? 'Verified' : 'Pending'}">Verification Status</span></p>
+                <p style="margin: 0;">Verified At: <span th:text="${#temporals.format(verifiedAt, 'dd-MM-yyyy HH:mm')}">Verification Date</span></p>
+            </div>
+
+            <p style="margin-bottom: 15px;" th:text="${message}">Verification Message</p>
+
+            <p style="margin-bottom: 15px;">Your machine is now visible to potential customers and ready for bookings. We recommend keeping your machine's information up to date to maintain the best possible experience for our users.</p>
+
+            <div style="text-align: center; margin-top: 30px; margin-bottom: 30px;">
+                <a href="#" style="background-color: #0066cc; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block;">View Your Machine</a>
+            </div>
+
+            <p style="margin-bottom: 15px;">If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+
+            <p style="margin-bottom: 5px;">Best regards,</p>
+            <p style="margin-top: 0;">The Equipment Rental Team</p>
+        </td>
+    </tr>
+
+    <!-- Footer -->
+    <tr>
+        <td style="padding: 20px; background-color: #f8f9fa; text-align: center; font-size: 12px; color: #666666;">
+            <p style="margin: 0; margin-bottom: 10px;">This is an automated message, please do not reply to this email.</p>
+            <p style="margin: 0;">© 2024 Equipment Rental. All rights reserved.</p>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

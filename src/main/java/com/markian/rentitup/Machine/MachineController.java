@@ -118,4 +118,15 @@ public class MachineController {
         List<String> machineConditions = machineService.getMachineCondition();
         return ResponseEntity.ok(machineConditions);
     }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/verify-machine")
+    public ResponseEntity<String> verifyMachine(
+            @RequestParam("machineId") Long machineId
+    ) {
+        String response =  machineService.verifyMachine(machineId);
+        return ResponseEntity.ok(response);
+    }
+
+
 }

@@ -33,4 +33,6 @@ public interface MachineService {
     List<MachineListResponseDto> getAllByOwner(Long ownerId);
 
     List<String> getMachineCondition();
+
+    String verifyMachine (Long machineId) throws MachineException ;
 }

@@ -14,10 +14,11 @@ import com.markian.rentitup.MaintenanceRecord.MaintenanceRecordRepository;
 import com.markian.rentitup.MaintenanceRecord.MaintenanceRecordService;
 import com.markian.rentitup.Utils.AwsS3Service;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
+@Service
 public class MaintenanceRecordServiceImpl implements MaintenanceRecordService {
     private final MaintenanceRecordRepository maintenanceRecordRepository;
     private final MaintenanceRecordMapper maintenanceRecordMapper;

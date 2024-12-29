@@ -23,6 +23,8 @@ public class MachineResponseDto {
 
     private BigDecimal basePrice;
 
+    private Boolean verified;
+
     private MachineAvailability status;
 
     private MachineCondition condition;

@@ -10,6 +10,7 @@ import com.markian.rentitup.Category.Dto.CategoryResponseDto;
 import com.markian.rentitup.Category.PriceCalculationType;
 import com.markian.rentitup.Exceptions.CategoryException;
 import com.markian.rentitup.Exceptions.MachineException;
+import com.markian.rentitup.Machine.Machine;
 import org.springframework.stereotype.Service;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -61,12 +63,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponseDto getCategoryById(Long id) throws CategoryException {
-
         try {
-            Category category = categoryRepository.findById(id)
+            Category category = categoryRepository.findByIdWithVerifiedMachines(id)
                     .orElseThrow(() -> new CategoryException("could not find category by  " + id));
             return categoryMapper.toCategoryResponseDto(category);
-
         } catch (CategoryException e) {
             throw e;
         } catch (Exception e) {
