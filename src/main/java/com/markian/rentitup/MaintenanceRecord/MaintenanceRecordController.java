@@ -2,8 +2,10 @@ package com.markian.rentitup.MaintenanceRecord;
 
 import com.markian.rentitup.MaintenanceRecord.MaintenanceRecordDto.MaintenanceRecordRequest;
 import com.markian.rentitup.MaintenanceRecord.MaintenanceRecordDto.MaintenanceRecordResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")  // Changed base path
+@Slf4j
 public class MaintenanceRecordController {
     private final MaintenanceRecordService maintenanceRecordService;
 
@@ -18,15 +21,28 @@ public class MaintenanceRecordController {
         this.maintenanceRecordService = maintenanceRecordService;
     }
 
-    @PostMapping(value = "/machines/{machineId}/maintenance-records", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MaintenanceRecordResponse> createMaintenanceRecord(
-            @RequestPart("request") MaintenanceRecordRequest request,
+    @PreAuthorize("hasRole('OWNER')")
+    @PostMapping(value = "/machines/{machineId}/maintenance-records/json", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MaintenanceRecordResponse> createMaintenanceRecordJson(
             @PathVariable Long machineId,
-            @RequestPart("file") MultipartFile file
+            @RequestBody MaintenanceRecordRequest request
     ) {
-        MaintenanceRecordResponse response = maintenanceRecordService.addRecord(machineId, request, file);
+        MaintenanceRecordResponse response = maintenanceRecordService.addRecordMetadata(machineId, request);
         return ResponseEntity.ok(response);
     }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @PostMapping(value = "/maintenance-records/{id}/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadFile(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file
+    ) {
+        maintenanceRecordService.saveRecordImage(id, file);
+        return ResponseEntity.ok("File uploaded successfully");
+    }
+
+
+
 
     @GetMapping("/machines/{machineId}/maintenance-records")
     public ResponseEntity<List<MaintenanceRecordResponse>> getMachineMaintenanceRecords(
@@ -36,7 +52,13 @@ public class MaintenanceRecordController {
         return ResponseEntity.ok(responseList);
     }
 
-    // These endpoints don't need machineId as they operate on the maintenance record directly
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("maintenance-records")
+    public ResponseEntity<List<MaintenanceRecordResponse>> getUncheckedMaintenanceRecords() {
+        List<MaintenanceRecordResponse> responseList = maintenanceRecordService.getUncheckedRecords();
+        return ResponseEntity.ok(responseList);
+    }
+
     @GetMapping("/maintenance-records/{id}")
     public ResponseEntity<MaintenanceRecordResponse> getMaintenanceRecord(
             @PathVariable Long id
@@ -45,22 +67,29 @@ public class MaintenanceRecordController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/maintenance-records/{id}")
-    public ResponseEntity<MaintenanceRecordResponse> updateMaintenanceRecord(
+    public ResponseEntity<String> updateMaintenanceRecord(
             @PathVariable Long id,
             @RequestPart("request") MaintenanceRecordRequest request
     ) {
-        String result = maintenanceRecordService.updateRecord(id, request);
-        // Consider updating the service to return MaintenanceRecordResponse instead of String
-        MaintenanceRecordResponse response = maintenanceRecordService.getRecordById(id);
+        String response= maintenanceRecordService.updateRecord(id, request);
         return ResponseEntity.ok(response);
     }
 
+
+
     @DeleteMapping("/maintenance-records/{id}")
-    public ResponseEntity<Void> deleteMaintenanceRecord(
+    public ResponseEntity<String> deleteMaintenanceRecord(
             @PathVariable Long id
     ) {
-        maintenanceRecordService.deleteRecord(id);
-        return ResponseEntity.noContent().build();
+        String response = maintenanceRecordService.deleteRecord(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("maintenance-records/{id}/verify")
+    public ResponseEntity<MaintenanceRecordResponse> verifyRecord(@PathVariable Long id) {
+        return ResponseEntity.ok(maintenanceRecordService.verifyMaintenanceRecord(id));
     }
 }

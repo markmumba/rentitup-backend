@@ -7,10 +7,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface MaintenanceRecordService {
-    MaintenanceRecordResponse addRecord (Long machineId, MaintenanceRecordRequest request, MultipartFile imageRecord);
+    MaintenanceRecordResponse addRecordMetadata(Long machineId, MaintenanceRecordRequest request);
+    String saveRecordImage(Long machineId, MultipartFile imageRecord);
     MaintenanceRecordResponse getRecordById (Long id);
     List<MaintenanceRecordResponse> getRecordsForMachine(Long machineId);
+    List<MaintenanceRecordResponse> getUncheckedRecords();
     String updateRecord(Long id,MaintenanceRecordRequest request);
     String deleteRecord(Long id);
+    MaintenanceRecordResponse verifyMaintenanceRecord(Long recordId);
 
 }

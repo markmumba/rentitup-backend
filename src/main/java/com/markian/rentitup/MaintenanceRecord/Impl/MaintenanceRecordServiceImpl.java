@@ -1,11 +1,12 @@
 package com.markian.rentitup.MaintenanceRecord.Impl;
 
-import com.amazonaws.services.kms.model.AWSKMSException;
 import com.markian.rentitup.Exceptions.MachineException;
 import com.markian.rentitup.Exceptions.MachineImageException;
 import com.markian.rentitup.Exceptions.MaintenanceRecordException;
+import com.markian.rentitup.Machine.Impl.MachineServiceImpl;
 import com.markian.rentitup.Machine.Machine;
 import com.markian.rentitup.Machine.MachineRepository;
+import com.markian.rentitup.Machine.MachineService;
 import com.markian.rentitup.MaintenanceRecord.MaintenanceRecord;
 import com.markian.rentitup.MaintenanceRecord.MaintenanceRecordDto.MaintenanceRecordMapper;
 import com.markian.rentitup.MaintenanceRecord.MaintenanceRecordDto.MaintenanceRecordRequest;
@@ -24,33 +25,51 @@ public class MaintenanceRecordServiceImpl implements MaintenanceRecordService {
     private final MaintenanceRecordMapper maintenanceRecordMapper;
     private final AwsS3Service awsS3Service;
     private final MachineRepository machineRepository;
+    private final MachineService machineService;
 
-    public MaintenanceRecordServiceImpl(MaintenanceRecordRepository maintenanceRecordRepository, MaintenanceRecordMapper maintenanceRecordMapper, AwsS3Service awsS3Service, MachineRepository machineRepository) {
+    public MaintenanceRecordServiceImpl(MaintenanceRecordRepository maintenanceRecordRepository,
+                                        MaintenanceRecordMapper maintenanceRecordMapper,
+                                        AwsS3Service awsS3Service,
+                                        MachineRepository machineRepository,
+                                        MachineService machineService) {
         this.maintenanceRecordRepository = maintenanceRecordRepository;
         this.maintenanceRecordMapper = maintenanceRecordMapper;
         this.awsS3Service = awsS3Service;
         this.machineRepository = machineRepository;
+        this.machineService = machineService;
     }
-
     @Override
-    public MaintenanceRecordResponse addRecord(Long machineId, MaintenanceRecordRequest request, MultipartFile imageRecord) {
+    public MaintenanceRecordResponse addRecordMetadata(Long machineId, MaintenanceRecordRequest request) {
         try {
             MaintenanceRecord maintenanceRecord = maintenanceRecordMapper.toEntity(request);
 
             Machine machine = findMachine(machineId);
             maintenanceRecord.setMachine(machine);
 
-            if (imageRecord != null && !imageRecord.isEmpty()) {
-                String imageUrl = awsS3Service.saveImageToS3(imageRecord, "maintenanceRecord/");
-                maintenanceRecord.setImageRecordUrl(imageUrl);
-            }
             MaintenanceRecord savedRecord = maintenanceRecordRepository.save(maintenanceRecord);
-
             return maintenanceRecordMapper.toResponse(savedRecord);
         } catch (MachineException e) {
             throw e;
         } catch (Exception e) {
-            throw new MaintenanceRecordException("Error while trying to add record " + e.getMessage(), e);
+            throw new MaintenanceRecordException("Error while saving record metadata: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public String saveRecordImage(Long id, MultipartFile imageRecord) {
+        try {
+            MaintenanceRecord maintenanceRecord = maintenanceRecordRepository.findById(id).orElseThrow(
+                    () -> new MaintenanceRecordException("No record of id " + id + "found")
+            );
+            if (imageRecord == null || imageRecord.isEmpty()) {
+                throw new MaintenanceRecordException("No image file provided");
+            }
+            String imageUrl = awsS3Service.saveImageToS3(imageRecord, "maintenanceRecord/");
+            maintenanceRecord.setImageRecordUrl(imageUrl);
+            maintenanceRecordRepository.save(maintenanceRecord);
+            return "Image uploaded succesfully";
+        } catch (Exception e) {
+            throw new MaintenanceRecordException("Error while saving image: " + e.getMessage(), e);
         }
     }
 
@@ -130,9 +149,38 @@ public class MaintenanceRecordServiceImpl implements MaintenanceRecordService {
         }
     }
 
+    @Override
+    public List<MaintenanceRecordResponse> getUncheckedRecords() {
+        return maintenanceRecordRepository.findByCheckedFalseOrderByCreatedAtDesc()
+                .stream()
+                .map(maintenanceRecordMapper::toResponse)
+                .toList();
+    }
 
     private Machine findMachine(Long machineId) {
         return machineRepository.findById(machineId)
                 .orElseThrow(() -> new MachineException("Machine not found with ID: " + machineId));
     }
+
+    @Override
+    public MaintenanceRecordResponse verifyMaintenanceRecord(Long recordId) throws MaintenanceRecordException {
+        try {
+            MaintenanceRecord record = maintenanceRecordRepository.findById(recordId)
+                    .orElseThrow(() -> new MaintenanceRecordException("Record not found"));
+
+            // Mark the record as checked
+            record.setChecked(true);
+            maintenanceRecordRepository.save(record);
+
+            // Verify the machine
+            machineService.verifyMachine(record.getMachine().getId());
+
+            return maintenanceRecordMapper.toResponse(record);
+        } catch (MachineException e) {
+            throw new MaintenanceRecordException("Failed to verify machine: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new MaintenanceRecordException("Failed to verify maintenance record", e);
+        }
+    }
+
 }

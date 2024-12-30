@@ -292,8 +292,9 @@ public class MachineServiceImpl implements MachineService {
     public String verifyMachine(Long machineId) throws MachineException {
         try{
             LocalDateTime verificationTime = LocalDateTime.now();
+            LocalDateTime deadline = verificationTime.plusMonths(3);
 
-            machineRepository.verifyMachine(Boolean.TRUE,machineId, verificationTime);
+            machineRepository.verifyMachine(Boolean.TRUE,machineId, verificationTime,deadline);
             Machine machine = machineRepository.findById(machineId).orElseThrow(
                     ()->new MachineException("Machine with id " + machineId + "not found")
             );

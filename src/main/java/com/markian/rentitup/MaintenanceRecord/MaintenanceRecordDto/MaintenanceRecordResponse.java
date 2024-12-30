@@ -13,6 +13,8 @@ public class MaintenanceRecordResponse {
 
     private String description;
 
+    private Boolean checked;
+
     private String performedBy;
 
     private LocalDate nextService;

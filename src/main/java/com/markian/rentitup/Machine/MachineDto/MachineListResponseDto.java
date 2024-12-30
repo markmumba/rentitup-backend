@@ -19,6 +19,8 @@ public class MachineListResponseDto {
 
     private String description;
 
+    private Boolean verified;
+
     private MachineAvailability status;
 
     private Boolean isAvailable;

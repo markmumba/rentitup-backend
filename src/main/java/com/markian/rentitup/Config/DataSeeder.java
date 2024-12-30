@@ -32,14 +32,29 @@ public class DataSeeder implements CommandLineRunner {
         if (categoryRepository.count() == 0) {
             seedCategories();
         }
-
+        if (userRepository.count() == 0 ) {
+            seedUser();
+        }
     }
 
     private void seedUser() {
-             User owner1 = User.builder()
-                .email("maxverstappen@gmail.com")
+
+        User admin = User.builder()
+                .email("admin@gmail.com")
                 .createdAt(LocalDateTime.now())
-                .fullName("Max Verstappen")
+                .fullName("Admin User")
+                .password(passwordEncoder.encode("qwerty1234"))
+                .updatedAt(LocalDateTime.now())
+                .phone("0789612925")
+                .role(Role.ADMIN)
+                .verified(true)
+                .build();
+
+
+             User owner = User.builder()
+                .email("markmumba01@gmail.com")
+                .createdAt(LocalDateTime.now())
+                .fullName("Owner user")
                 .password(passwordEncoder.encode("qwerty1234"))
                 .updatedAt(LocalDateTime.now())
                 .phone("0789612925")
@@ -47,10 +62,10 @@ public class DataSeeder implements CommandLineRunner {
                 .verified(true)
                 .build();
 
-        User owner2 = User.builder()
-                .email("sergioperez@gmail.com")
+        User customer = User.builder()
+                .email("markian.mwangi@riarauniversity.ac.ke")
                 .createdAt(LocalDateTime.now())
-                .fullName("Sergio Perez")
+                .fullName("Owner user")
                 .password(passwordEncoder.encode("qwerty1234"))
                 .updatedAt(LocalDateTime.now())
                 .phone("0789612925")
@@ -58,7 +73,8 @@ public class DataSeeder implements CommandLineRunner {
                 .verified(true)
                 .build();
 
-        userRepository.saveAll(Arrays.asList(owner1,owner2));
+
+        userRepository.saveAll(Arrays.asList(owner,admin,customer));
         System.out.println("User created successfully");
     }
 

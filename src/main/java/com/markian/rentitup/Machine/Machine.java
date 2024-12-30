@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -22,6 +23,8 @@ public class Machine extends BaseEntity {
     private String description;
 
     private Boolean verified = false;
+
+    private LocalDateTime verificationDeadline;
 
     @Column(nullable = false)
     private BigDecimal basePrice;
@@ -53,4 +56,10 @@ public class Machine extends BaseEntity {
 
     @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MachineImage> machineImages;
+
+    @Transient
+    public boolean isVerificationValid() {
+        return verified && verificationDeadline != null &&
+                LocalDateTime.now().isBefore(verificationDeadline);
+    }
 }

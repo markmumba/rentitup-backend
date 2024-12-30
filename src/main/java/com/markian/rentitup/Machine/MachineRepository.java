@@ -20,8 +20,10 @@ public interface MachineRepository extends JpaRepository<Machine, Long> {
     List<Machine> findAllByOwnerId(Long ownerId);
 
     @Modifying
-    @Query("UPDATE machine m SET m.verified = :verified ,m.updatedAt= :time WHERE m.id =:machineId")
-    void verifyMachine(@Param("verified") Boolean verified, @Param("machineId") Long machineId, @Param("time") LocalDateTime time);
+    @Query("UPDATE machine m SET m.verified = :verified ,m.updatedAt= :time, m.verificationDeadline= :deadline WHERE m.id =:machineId")
+    void verifyMachine(@Param("verified") Boolean verified, @Param("machineId") Long machineId, @Param("time") LocalDateTime time,@Param("deadline") LocalDateTime deadline);
 
+    @Query("SELECT m FROM machine m WHERE m.verified = true AND m.verificationDeadline < :currentTime")
+    List<Machine> findByVerifiedTrueAndVerificationDeadlineBefore(LocalDateTime currentTime);
 }
 

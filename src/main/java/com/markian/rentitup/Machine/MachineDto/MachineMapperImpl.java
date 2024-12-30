@@ -58,6 +58,7 @@ public class MachineMapperImpl implements MachineMapper {
         responseDto.setSpecification(machine.getSpecification());
         responseDto.setIsAvailable(machine.getIsAvailable());
         responseDto.setCondition(machine.getCondition());
+        responseDto.setVerified(machine.getVerified());
         if (machine.getOwner() != null) {
             responseDto.setOwner(toSimpleUserDto(machine.getOwner()));
         }
@@ -83,6 +84,7 @@ public class MachineMapperImpl implements MachineMapper {
         responseDto.setIsAvailable(machine.getIsAvailable());
         responseDto.setCondition(machine.getCondition());
         responseDto.setDescription(machine.getDescription());
+        responseDto.setVerified(machine.getVerified());
         responseDto.setMachineImageUrl(machine.getMachineImages()
                 .stream()
                 .filter(MachineImage::getIsPrimary)

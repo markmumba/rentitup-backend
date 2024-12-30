@@ -64,8 +64,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponseDto getCategoryById(Long id) throws CategoryException {
         try {
-            Category category = categoryRepository.findByIdWithVerifiedMachines(id)
+            Category category = categoryRepository.findById(id)
                     .orElseThrow(() -> new CategoryException("could not find category by  " + id));
+
             return categoryMapper.toCategoryResponseDto(category);
         } catch (CategoryException e) {
             throw e;

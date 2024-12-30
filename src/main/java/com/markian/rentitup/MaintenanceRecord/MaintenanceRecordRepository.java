@@ -6,4 +6,7 @@ import java.util.List;
 
 public interface MaintenanceRecordRepository extends JpaRepository<MaintenanceRecord, Long> {
     List<MaintenanceRecord> findAllByMachine_IdOrderByServiceDate(Long machineId);
+
+    List<MaintenanceRecord> findByCheckedFalseOrderByCreatedAtDesc();
+
 }

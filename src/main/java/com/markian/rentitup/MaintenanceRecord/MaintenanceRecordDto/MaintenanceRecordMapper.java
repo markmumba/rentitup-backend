@@ -16,6 +16,7 @@ public class MaintenanceRecordMapper {
         MaintenanceRecordResponse response = new MaintenanceRecordResponse();
         response.setId(entity.getId());
         response.setServiceDate(entity.getServiceDate());
+        response.setChecked(entity.getChecked());
         response.setDescription(entity.getDescription());
         response.setPerformedBy(entity.getPerformedBy());
         response.setNextService(entity.getNextService());
