@@ -5,6 +5,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.markian.rentitup.Exceptions.UserException;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
@@ -27,30 +29,40 @@ public class AwsS3Service {
     @Value("${aws.s3.secret-key}")
     private String awsS3SecretKey;
 
-    public String saveImageToS3(MultipartFile photo,String foldername) {
+    public String saveImageToS3(MultipartFile photo, String foldername) {
+        // First check file size
+        if (photo.getSize() > 10 * 1024 * 1024) {
+            throw new UserException("Image size exceeds 10MB limit");
+        }
 
         try {
-            if (photo.getSize() > 10 * 1024 * 1024) {  // 10MB limit
-                throw new UserException("Image size exceeds 10MB");
-            }
-            String s3Filename = foldername + UUID.randomUUID().toString() + "_" + photo.getOriginalFilename();
+            String s3Filename = foldername + UUID.randomUUID() + "_" + photo.getOriginalFilename();
+
+            // Create S3 client once and reuse it (consider making it a bean)
             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsS3AccessKey, awsS3SecretKey);
             AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
                     .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                     .withRegion(Regions.US_EAST_2)
                     .build();
 
-            InputStream inputStream = photo.getInputStream();
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(photo.getContentType());
             metadata.setContentLength(photo.getSize());
-            metadata.setContentType("image/jpeg");
 
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3Filename, inputStream, metadata);
+            // Let AWS detect content type instead of hardcoding to JPEG
+            metadata.setContentType(photo.getContentType());
+
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3Filename, photo.getInputStream(), metadata);
             s3Client.putObject(putObjectRequest);
+
             return "https://" + bucketName + ".s3.amazonaws.com/" + s3Filename;
+
+        } catch (IOException e) {
+            throw new UserException("Failed to read image file: " + e.getMessage(), e);
+        } catch (AmazonS3Exception e) {
+            throw new UserException("Failed to upload to S3: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new UserException("Unable to upload image to s3 bucket" + e.getMessage(), e);
+            throw new UserException("Unexpected error during S3 upload: " + e.getMessage(), e);
         }
     }
 

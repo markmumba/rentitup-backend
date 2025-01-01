@@ -1,5 +1,6 @@
 package com.markian.rentitup.MaintenanceRecord.MaintenanceRecordDto;
 
+import com.markian.rentitup.Machine.MachineDto.MachineResponseDto;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -20,4 +21,6 @@ public class MaintenanceRecordResponse {
     private LocalDate nextService;
 
     private String imageRecordUrl;
+
+    private MachineResponseDto machine;
 }

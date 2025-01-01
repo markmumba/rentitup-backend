@@ -54,7 +54,7 @@ public class Machine extends BaseEntity {
     @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MaintenanceRecord> maintainanceRecords;
 
-    @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "machine",fetch =FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MachineImage> machineImages;
 
     @Transient

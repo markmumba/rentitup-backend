@@ -1,11 +1,18 @@
 package com.markian.rentitup.MaintenanceRecord.MaintenanceRecordDto;
 
 import com.markian.rentitup.Machine.Machine;
+import com.markian.rentitup.Machine.MachineDto.MachineMapper;
 import com.markian.rentitup.MaintenanceRecord.MaintenanceRecord;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MaintenanceRecordMapper {
+
+    private final MachineMapper machineMapper;
+
+    public MaintenanceRecordMapper(MachineMapper machineMapper) {
+        this.machineMapper = machineMapper;
+    }
 
 
     public MaintenanceRecordResponse toResponse(MaintenanceRecord entity) {
@@ -21,6 +28,7 @@ public class MaintenanceRecordMapper {
         response.setPerformedBy(entity.getPerformedBy());
         response.setNextService(entity.getNextService());
         response.setImageRecordUrl(entity.getImageRecordUrl());
+        response.setMachine(machineMapper.toResponseDto(entity.getMachine()));
 
         return response;
     }

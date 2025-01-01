@@ -18,11 +18,11 @@ import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
 import com.markian.rentitup.User.UserRepository;
 import com.markian.rentitup.Utils.AwsS3Service;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -289,6 +289,7 @@ public class MachineServiceImpl implements MachineService {
     }
 
     @Override
+    @Transactional
     public String verifyMachine(Long machineId) throws MachineException {
         try{
             LocalDateTime verificationTime = LocalDateTime.now();
@@ -321,7 +322,7 @@ public class MachineServiceImpl implements MachineService {
             return "Machine has been verified ";
 
         }catch (Exception e) {
-            throw new MachineException("Unable to verify machine");
+            throw new MachineException("Unable to verify machine" +e.getMessage(),e);
         }
     }
 }

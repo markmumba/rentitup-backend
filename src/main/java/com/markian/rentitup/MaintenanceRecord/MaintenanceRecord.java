@@ -24,7 +24,7 @@ public class MaintenanceRecord extends BaseEntity {
 
 
     @Column(nullable = false)
-    private Boolean checked = false;
+    private Boolean checked = Boolean.FALSE ;
 
     private LocalDate nextService;
 
