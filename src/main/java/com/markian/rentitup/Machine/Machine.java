@@ -22,9 +22,12 @@ public class Machine extends BaseEntity {
 
     private String description;
 
-    private Boolean verified = false;
+    private Boolean verified = Boolean.FALSE;
 
     private LocalDateTime verificationDeadline;
+
+    @Enumerated(EnumType.STRING)
+    private MachineVerificationState verificationState = MachineVerificationState.PENDING;
 
     @Column(nullable = false)
     private BigDecimal basePrice;
@@ -52,7 +55,7 @@ public class Machine extends BaseEntity {
     private List<Booking> bookings;
 
     @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MaintenanceRecord> maintainanceRecords;
+    private List<MaintenanceRecord> maintenanceRecords;
 
     @OneToMany(mappedBy = "machine",fetch =FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MachineImage> machineImages;

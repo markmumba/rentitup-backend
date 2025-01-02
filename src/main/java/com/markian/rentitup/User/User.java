@@ -68,7 +68,7 @@ public class User extends BaseEntity implements UserDetails {
     private String nationalId;
 
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Machine> ownedMachines;
 
     @OneToMany(mappedBy = "customer")

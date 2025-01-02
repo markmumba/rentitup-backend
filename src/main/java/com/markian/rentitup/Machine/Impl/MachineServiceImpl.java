@@ -1,19 +1,20 @@
 package com.markian.rentitup.Machine.Impl;
 
+import com.markian.rentitup.Booking.Booking;
 import com.markian.rentitup.Category.Category;
 import com.markian.rentitup.Category.CategoryRepository;
 import com.markian.rentitup.Config.EmailService;
 import com.markian.rentitup.Exceptions.CategoryException;
 import com.markian.rentitup.Exceptions.MachineException;
+import com.markian.rentitup.Exceptions.MachineImageException;
 import com.markian.rentitup.Exceptions.UserException;
-import com.markian.rentitup.Machine.Machine;
-import com.markian.rentitup.Machine.MachineCondition;
+import com.markian.rentitup.Machine.*;
 import com.markian.rentitup.Machine.MachineDto.MachineListResponseDto;
 import com.markian.rentitup.Machine.MachineDto.MachineMapper;
 import com.markian.rentitup.Machine.MachineDto.MachineRequestDto;
 import com.markian.rentitup.Machine.MachineDto.MachineResponseDto;
-import com.markian.rentitup.Machine.MachineRepository;
-import com.markian.rentitup.Machine.MachineService;
+import com.markian.rentitup.MachineImage.MachineImage;
+import com.markian.rentitup.MaintenanceRecord.MaintenanceRecord;
 import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
 import com.markian.rentitup.User.UserRepository;
@@ -91,20 +92,18 @@ public class MachineServiceImpl implements MachineService {
     @Override
     public MachineResponseDto createMachine(MachineRequestDto machineRequestDto) {
         try {
+
             Category category = categoryRepository.findById(machineRequestDto.getCategoryId())
                     .orElseThrow(() -> new MachineException("Category not found with id: " + machineRequestDto.getCategoryId()));
 
             User user = userRepository.findById(machineRequestDto.getOwnerId())
                     .orElseThrow(() -> new UserException("Owner of id not found"));
 
-            if (user.getRole() != Role.OWNER) {
-                throw new MachineException("user is not owner ");
-            }
-
             Machine machine = machineMapper.toEntity(machineRequestDto);
             machine.setCategory(category);
             machine.setOwner(user);
             machine.setIsAvailable(true);
+            machine.setVerificationState(MachineVerificationState.PENDING);
 
             return machineMapper.toResponseDto(
                     machineRepository.save(machine)
@@ -153,16 +152,72 @@ public class MachineServiceImpl implements MachineService {
     @Transactional
     public String deleteMachine(Long id) throws MachineException {
         try {
+
             Machine machine = machineRepository.findById(id)
                     .orElseThrow(() -> new MachineException("Machine not found with id: " + id));
+
+            if (!machine.getMachineImages().isEmpty()) {
+                for (MachineImage machineImage : machine.getMachineImages()) {
+                    try {
+                        awsS3Service.deleteImageFromS3(machineImage.getUrl());
+                        log.info("Deleted S3 image: {}", machineImage.getUrl());
+                    } catch (MachineImageException e) {
+                        throw new MachineImageException("Unable to delete the images" + e.getMessage(), e);
+                    }
+                }
+            }
+
+            if (machine.getCategory() != null) {
+                Category category = machine.getCategory();
+                category.getMachines().remove(machine);
+                machine.setCategory(null);
+            }
+
+            if (machine.getOwner() != null) {
+                User owner = machine.getOwner();
+                owner.getOwnedMachines().remove(machine);
+                machine.setOwner(null);
+            }
+
+            if (machine.getBookings() != null) {
+                for (Booking booking : new ArrayList<>(machine.getBookings())) {
+                    if (booking.getPayments() != null) {
+                        booking.getPayments().clear();
+                    }
+                    if (booking.getReview() != null) {
+                        booking.setReview(null);
+                    }
+                    booking.setMachine(null);
+                }
+                machine.getBookings().clear();
+            }
+
+            if (machine.getMaintenanceRecords() != null) {
+                for (MaintenanceRecord record : new ArrayList<>(machine.getMaintenanceRecords())) {
+                    record.setMachine(null);
+                }
+                machine.getMaintenanceRecords().clear();
+            }
+
+            if (machine.getMachineImages() != null) {
+                for (MachineImage image : new ArrayList<>(machine.getMachineImages())) {
+                    image.setMachine(null);
+                }
+                machine.getMachineImages().clear();
+            }
+
+            machineRepository.saveAndFlush(machine);
+
             machineRepository.delete(machine);
+            machineRepository.flush();
+
             return "Machine deleted successfully";
-        } catch (MachineException e) {
-            throw e;
         } catch (Exception e) {
             throw new MachineException("Error while deleting the machine: " + e.getMessage(), e);
         }
     }
+
+
 
 
     @Override
@@ -295,7 +350,9 @@ public class MachineServiceImpl implements MachineService {
             LocalDateTime verificationTime = LocalDateTime.now();
             LocalDateTime deadline = verificationTime.plusMonths(3);
 
-            machineRepository.verifyMachine(Boolean.TRUE,machineId, verificationTime,deadline);
+            MachineVerificationState verificationState = MachineVerificationState.COMPLETE;
+
+            machineRepository.verifyMachine(Boolean.TRUE,machineId, verificationTime,deadline,verificationState);
             Machine machine = machineRepository.findById(machineId).orElseThrow(
                     ()->new MachineException("Machine with id " + machineId + "not found")
             );

@@ -5,9 +5,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import com.markian.rentitup.Exceptions.UserException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.UUID;
 
 @Service
@@ -65,23 +65,51 @@ public class AwsS3Service {
             throw new UserException("Unexpected error during S3 upload: " + e.getMessage(), e);
         }
     }
-
     public void deleteImageFromS3(String imageUrl) {
         try {
-            // Extract filename from URL
-            String s3Filename = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-
             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsS3AccessKey, awsS3SecretKey);
             AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
                     .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                     .withRegion(Regions.US_EAST_2)
                     .build();
 
-            // Delete the object
+
+            String s3Filename = extractS3KeyFromUrl(imageUrl);
+            boolean exists = s3Client.doesObjectExist(bucketName, s3Filename);
+
+            if (!exists) {
+                throw new UserException("Image file does not exist in S3: " + s3Filename);
+            }
+
+            try {
+                ObjectMetadata metadata = s3Client.getObjectMetadata(bucketName, s3Filename);
+            } catch (AmazonS3Exception e) {
+                throw e;
+            }
+
             s3Client.deleteObject(bucketName, s3Filename);
 
+        } catch (AmazonS3Exception e) {
+            if (e.getStatusCode() == 403) {
+                throw new UserException("Permission denied: Unable to delete image from S3. Please check IAM permissions.", e);
+            }
+            throw new UserException("AWS S3 error while deleting image: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new UserException("Unable to delete image from s3 bucket: " + e.getMessage(), e);
+            throw new UserException("Unexpected error while deleting image from S3: " + e.getMessage(), e);
+        }
+    }
+
+    private String extractS3KeyFromUrl(String imageUrl) {
+        try {
+            String baseUrl = "https://" + bucketName + ".s3.amazonaws.com/";
+            if (imageUrl.startsWith(baseUrl)) {
+                return imageUrl.substring(baseUrl.length());
+            }
+            URL url = new URL(imageUrl);
+            String path = url.getPath();
+            return path.startsWith("/") ? path.substring(1) : path;
+        } catch (MalformedURLException e) {
+            throw new UserException("Invalid S3 URL format: " + imageUrl);
         }
     }
 }

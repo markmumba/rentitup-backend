@@ -3,6 +3,7 @@ package com.markian.rentitup.Machine.MachineDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.markian.rentitup.Machine.MachineAvailability;
 import com.markian.rentitup.Machine.MachineCondition;
+import com.markian.rentitup.Machine.MachineVerificationState;
 import com.markian.rentitup.MachineImage.MachineImage;
 import com.markian.rentitup.MachineImage.MachineImageDto.MachineImageResponseDto;
 import com.markian.rentitup.User.User;
@@ -24,6 +25,8 @@ public class MachineResponseDto {
     private BigDecimal basePrice;
 
     private Boolean verified;
+
+    private MachineVerificationState verificationState;
 
     private MachineAvailability status;
 

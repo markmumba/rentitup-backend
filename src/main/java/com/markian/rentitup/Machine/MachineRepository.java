@@ -22,8 +22,12 @@ public interface MachineRepository extends JpaRepository<Machine, Long> {
 
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE machine m SET m.verified = :verified ,m.updatedAt= :time, m.verificationDeadline= :deadline WHERE m.id =:machineId")
-    void verifyMachine(@Param("verified") Boolean verified, @Param("machineId") Long machineId, @Param("time") LocalDateTime time,@Param("deadline") LocalDateTime deadline);
+    @Query("UPDATE machine m SET m.verified = :verified ,m.updatedAt= :time, m.verificationDeadline= :deadline, m.verificationState = :verificationState WHERE m.id =:machineId")
+    void verifyMachine(@Param("verified") Boolean verified,
+                       @Param("machineId") Long machineId,
+                       @Param("time") LocalDateTime time,
+                       @Param("deadline") LocalDateTime deadline,
+                       @Param("verificationState") MachineVerificationState verificationState);
 
     @Query("SELECT m FROM machine m WHERE m.verified = true AND m.verificationDeadline < :currentTime")
     List<Machine> findByVerifiedTrueAndVerificationDeadlineBefore(LocalDateTime currentTime);

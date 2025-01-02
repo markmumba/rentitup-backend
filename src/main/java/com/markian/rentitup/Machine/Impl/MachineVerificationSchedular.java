@@ -3,6 +3,7 @@ package com.markian.rentitup.Machine.Impl;
 import com.markian.rentitup.Config.EmailService;
 import com.markian.rentitup.Machine.Machine;
 import com.markian.rentitup.Machine.MachineRepository;
+import com.markian.rentitup.Machine.MachineVerificationState;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,8 +34,10 @@ public class MachineVerificationSchedular {
         List<Machine> expiredMachines =
                 machineRepository.findByVerifiedTrueAndVerificationDeadlineBefore(LocalDateTime.now());
         for (Machine machine :expiredMachines ) {
-            machine.setVerified(false);
+            machine.setVerified(Boolean.FALSE);
+            machine.setVerificationState(MachineVerificationState.PENDING);
             machine.setVerificationDeadline(null);
+
             machineRepository.save(machine);
 
             Map<String,Object > templateVariables = new HashMap<>();

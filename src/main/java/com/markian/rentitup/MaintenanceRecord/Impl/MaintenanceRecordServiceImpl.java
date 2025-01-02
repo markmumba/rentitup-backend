@@ -7,6 +7,7 @@ import com.markian.rentitup.Machine.Impl.MachineServiceImpl;
 import com.markian.rentitup.Machine.Machine;
 import com.markian.rentitup.Machine.MachineRepository;
 import com.markian.rentitup.Machine.MachineService;
+import com.markian.rentitup.Machine.MachineVerificationState;
 import com.markian.rentitup.MaintenanceRecord.MaintenanceRecord;
 import com.markian.rentitup.MaintenanceRecord.MaintenanceRecordDto.MaintenanceRecordMapper;
 import com.markian.rentitup.MaintenanceRecord.MaintenanceRecordDto.MaintenanceRecordRequest;
@@ -48,7 +49,9 @@ public class MaintenanceRecordServiceImpl implements MaintenanceRecordService {
             MaintenanceRecord maintenanceRecord = maintenanceRecordMapper.toEntity(request);
 
             Machine machine = findMachine(machineId);
+
             maintenanceRecord.setMachine(machine);
+
 
             MaintenanceRecord savedRecord = maintenanceRecordRepository.save(maintenanceRecord);
             return maintenanceRecordMapper.toResponse(savedRecord);
@@ -162,8 +165,11 @@ public class MaintenanceRecordServiceImpl implements MaintenanceRecordService {
     }
 
     private Machine findMachine(Long machineId) {
-        return machineRepository.findById(machineId)
+        Machine machine = machineRepository.findById(machineId)
                 .orElseThrow(() -> new MachineException("Machine not found with ID: " + machineId));
+        machine.setVerificationState(MachineVerificationState.ONGOING);
+        machineRepository.save(machine);
+        return machine;
     }
 
     @Override

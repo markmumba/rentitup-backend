@@ -58,6 +58,7 @@ public class MachineMapperImpl implements MachineMapper {
         responseDto.setSpecification(machine.getSpecification());
         responseDto.setIsAvailable(machine.getIsAvailable());
         responseDto.setCondition(machine.getCondition());
+        responseDto.setVerificationState(machine.getVerificationState());
         responseDto.setVerified(machine.getVerified());
         if (machine.getOwner() != null) {
             responseDto.setOwner(toSimpleUserDto(machine.getOwner()));
