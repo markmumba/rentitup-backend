@@ -1,5 +1,6 @@
 package com.markian.rentitup.User.Impl;
 
+import com.markian.rentitup.Config.EmailService;
 import com.markian.rentitup.Exceptions.UserException;
 import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
@@ -45,9 +46,10 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
     private final AwsS3Service awsS3Service;
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+    private final EmailService emailService;
 
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, JavaMailSender mailSender, PasswordEncoder passwordEncoder, JwtTokenUtil jwtTokenUtil, AuthenticationManager authenticationManager, AwsS3Service awsS3Service) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, JavaMailSender mailSender, PasswordEncoder passwordEncoder, JwtTokenUtil jwtTokenUtil, AuthenticationManager authenticationManager, AwsS3Service awsS3Service, EmailService emailService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.mailSender = mailSender;
@@ -55,6 +57,7 @@ public class UserServiceImpl implements UserService {
         this.jwtTokenUtil = jwtTokenUtil;
         this.authenticationManager = authenticationManager;
         this.awsS3Service = awsS3Service;
+        this.emailService = emailService;
     }
 
     @Override
@@ -335,14 +338,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void sendVerificationEmail(String to, String subject, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(text);
-        mailSender.send(message);
-
-    }
 
     private User findUserById(Long id) throws UserException {
         return userRepository.findById(id)
@@ -352,26 +347,41 @@ public class UserServiceImpl implements UserService {
     private String processVerifiedOwners(User user, Long adminId) {
         userRepository.verifyUser(true, LocalDateTime.now(), adminId, null, user.getId());
 
+        Map<String,Object> templateVariables = new HashMap<>();
+
+        templateVariables.put("ownerName",user.getFullName());
+        templateVariables.put("nationalID",user.getNationalId());
+        templateVariables.put("verificationMessage","  Your account has been successfully been activated you can now add the machines you want to rent out Note: The machines will also be checked carefully ");
+
         CompletableFuture.runAsync(() ->
-                sendVerificationEmail(
+                emailService.sendEmail(
                         user.getEmail(),
                         "Successfully Account Verification",
-                        "Your account has been successfully been activated you can now add the machines you want to rent out ." +
-                                "Note: The machines will also be checked carefully "
-                )
-        );
+                        "owner-verification",
+                        templateVariables
+                ));
+
 
         return "Owner  verified successfully and email sent.";
     }
 
     private String processRejectedOwners(User user) {
+
+        Map<String,Object> templateVariables = new HashMap<>();
+
+        templateVariables.put("ownerName",user.getFullName());
+        templateVariables.put("nationalID",user.getNationalId());
+        templateVariables.put("verificationMessage","Your account was not accepted. Please try registering with more details. or the correct details ");
+
+
         CompletableFuture.runAsync(() ->
-                sendVerificationEmail(
+                emailService.sendEmail(
                         user.getEmail(),
                         "Account creation denied",
-                        "Your account was not accepted. Please try registering with more details. or the correct details "
-                )
-        );
+                        "owner-verification",
+                        templateVariables
+
+                ));
 
         userRepository.delete(user);
         return "Owner  account not accepted and was removed.";

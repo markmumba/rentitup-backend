@@ -2,6 +2,7 @@ package com.markian.rentitup.Category.Dto;
 
 import com.markian.rentitup.Category.Category;
 import com.markian.rentitup.Category.PriceCalculationType;
+import com.markian.rentitup.Machine.Machine;
 import com.markian.rentitup.Machine.MachineDto.MachineMapper;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,9 @@ public class CategoryMapper {
                 category.getName(),
                 category.getDescription(),
                 category.getPriceCalculationType(),
-                category.getMachines() != null ? category.getMachines().stream()
+                category.getMachines() != null ? category.getMachines()
+                        .stream()
+                        .filter(Machine::getVerified)
                         .map(machineMapper::toListResponseDto)
                         .toList()
                         : null

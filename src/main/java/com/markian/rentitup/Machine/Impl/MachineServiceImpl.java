@@ -55,6 +55,7 @@ public class MachineServiceImpl implements MachineService {
     public List<MachineListResponseDto> getAllMachines() {
         return machineRepository.findAll()
                 .stream()
+                .filter(Machine::getVerified)
                 .map(machineMapper::toListResponseDto)
                 .toList();
     }
@@ -233,6 +234,7 @@ public class MachineServiceImpl implements MachineService {
             }
 
             return machines.stream()
+                    .filter(Machine::getVerified)
                     .map(machineMapper::toListResponseDto)
                     .toList();
 
@@ -258,6 +260,7 @@ public class MachineServiceImpl implements MachineService {
                 return Collections.emptyList();
             }
             return machines.stream()
+                    .filter(Machine::getVerified)
                     .map(machineMapper::toListResponseDto)
                     .toList();
 
@@ -282,6 +285,7 @@ public class MachineServiceImpl implements MachineService {
             }
 
             return machines.stream()
+                    .filter(Machine::getVerified)
                     .map(machineMapper::toListResponseDto)
                     .toList();
 
@@ -304,6 +308,7 @@ public class MachineServiceImpl implements MachineService {
                 return Collections.emptyList();
             }
             return machines.stream()
+                    .filter(Machine::getVerified)
                     .map(machineMapper::toListResponseDto)
                     .toList();
         } catch (MachineException e) {
