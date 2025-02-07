@@ -7,10 +7,7 @@ import com.markian.rentitup.Category.Dto.CategoryListResponse;
 import com.markian.rentitup.Category.Dto.CategoryMapper;
 import com.markian.rentitup.Category.Dto.CategoryRequestDto;
 import com.markian.rentitup.Category.Dto.CategoryResponseDto;
-import com.markian.rentitup.Category.PriceCalculationType;
 import com.markian.rentitup.Exceptions.CategoryException;
-import com.markian.rentitup.Exceptions.MachineException;
-import com.markian.rentitup.Machine.Machine;
 import org.springframework.stereotype.Service;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -75,31 +72,17 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    @Override
-    public List<String> getPriceCalculationType() {
-        return Arrays.asList(
-                PriceCalculationType.HOURLY.name(),
-                PriceCalculationType.DAILY.name(),
-                PriceCalculationType.DISTANCE_BASED.name()
-        );
-    }
+
 
     @Override
     public String updateCategory(Long id, CategoryRequestDto categoryRequestDto) throws CategoryException {
 
         try {
-            PriceCalculationType priceCalculationType;
-            try {
-                priceCalculationType = PriceCalculationType.valueOf(categoryRequestDto.getPriceCalculationType());
 
-            } catch (IllegalArgumentException e) {
-                throw new CategoryException("Invalid price type", e);
-            }
             Category category = categoryRepository.findById(id)
                     .orElseThrow(() -> new CategoryException("could not find category by  " + id));
             category.setName(categoryRequestDto.getName());
             category.setDescription(categoryRequestDto.getDescription());
-            category.setPriceCalculationType(priceCalculationType);
             categoryRepository.save(category);
 
             return "Category updated successful";

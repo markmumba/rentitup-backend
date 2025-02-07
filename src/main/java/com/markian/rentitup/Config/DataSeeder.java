@@ -2,7 +2,6 @@ package com.markian.rentitup.Config;
 
 import com.markian.rentitup.Category.Category;
 import com.markian.rentitup.Category.CategoryRepository;
-import com.markian.rentitup.Category.PriceCalculationType;
 import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
 import com.markian.rentitup.User.UserRepository;
@@ -83,49 +82,41 @@ public class DataSeeder implements CommandLineRunner {
         Category category1 = Category.builder()
                 .name("Material Handling Equipment")
                 .description("Machinery specifically designed to transport, load, and store materials, ideal for warehouses, construction sites, and manufacturing facilities. Examples include forklifts for lifting heavy loads, pallet jacks for moving pallets, and hand trucks for smaller items.")
-                .priceCalculationType(PriceCalculationType.HOURLY)
                 .build();
 
         Category category2 = Category.builder()
                 .name("Earth Moving Equipment")
                 .description("Heavy-duty machines used for excavating, grading, and compacting soil, often in construction and landscaping projects. Examples include excavators for digging, bulldozers for leveling terrain, and skid-steer loaders for versatile lifting and moving tasks.")
-                .priceCalculationType(PriceCalculationType.DAILY)
                 .build();
 
         Category category3 = Category.builder()
                 .name("Lawn & Garden Equipment")
                 .description("Small-scale machinery tailored for garden maintenance and landscaping, perfect for homeowners and gardeners. Examples include lawn mowers for trimming grass, leaf blowers for clearing leaves and debris, and hedge trimmers for pruning bushes and hedges.")
-                .priceCalculationType(PriceCalculationType.HOURLY)
                 .build();
 
         Category category4 = Category.builder()
                 .name("Concrete & Masonry Equipment")
                 .description("Tools and machines designed to work with concrete and masonry, essential for paving, construction, and home improvement projects. Examples include cement mixers for mixing concrete, concrete saws for cutting concrete slabs, and mortar mixers for combining mortar materials.")
-                .priceCalculationType(PriceCalculationType.DAILY)
                 .build();
 
         Category category5 = Category.builder()
                 .name("Power Tools")
                 .description("Handheld and portable tools that increase efficiency in a variety of tasks, including woodworking, metalworking, and construction. Examples include drills for making holes, angle grinders for cutting and grinding, and electric saws for precise cutting.")
-                .priceCalculationType(PriceCalculationType.HOURLY)
                 .build();
 
         Category category6 = Category.builder()
                 .name("Lifting & Hoisting Equipment")
                 .description("Machinery designed for lifting and moving heavy objects in construction, manufacturing, and warehousing. Examples include cranes for lifting and moving heavy loads, hoists for smaller items, and jacks for car repairs or minor lifting tasks.")
-                .priceCalculationType(PriceCalculationType.DISTANCE_BASED)
                 .build();
 
         Category category7 = Category.builder()
                 .name("Compaction Equipment")
                 .description("Equipment used to compress soil, gravel, or asphalt, making surfaces stable for construction projects like road building and foundations. Examples include plate compactors for smaller areas, rollers for large surface areas, and rammers for tight spaces.")
-                .priceCalculationType(PriceCalculationType.DAILY)
                 .build();
 
         Category category8 = Category.builder()
                 .name("Road Construction Equipment")
                 .description("Heavy machinery suited for building and maintaining roads, ideal for large construction projects. Examples include asphalt pavers for laying asphalt, road rollers for compacting surfaces, and concrete curb machines for creating road borders.")
-                .priceCalculationType(PriceCalculationType.DISTANCE_BASED)
                 .build();
 
         categoryRepository.saveAll(List.of(

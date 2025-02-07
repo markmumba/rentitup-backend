@@ -17,12 +17,12 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
-public class MachineVerificationSchedular {
+public class MachineVerificationScheduler {
 
     private final MachineRepository machineRepository;
     private final EmailService emailService;
 
-    public MachineVerificationSchedular(MachineRepository machineRepository, EmailService emailService) {
+    public MachineVerificationScheduler(MachineRepository machineRepository, EmailService emailService) {
         this.machineRepository = machineRepository;
         this.emailService = emailService;
     }

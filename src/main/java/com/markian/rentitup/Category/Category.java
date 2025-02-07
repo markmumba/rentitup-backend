@@ -28,7 +28,6 @@ public class Category  extends BaseEntity {
     @Column(length = 700)
     private String description;
 
-    private PriceCalculationType priceCalculationType;
 
 
 }
