@@ -27,7 +27,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingList);
     }
 
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('CUSTOMER','OWNER')")
     @PostMapping
     public ResponseEntity<BookingResponseDto> createBooking(
             @RequestBody BookingRequestDto bookingRequestDto
@@ -37,7 +37,7 @@ public class BookingController {
     }
 
 
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('CUSTOMER','OWNER')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<BookingListResponseDto>> getBookingsByUser(
             @PathVariable("userId") Long userId
@@ -72,7 +72,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingList);
     }
 
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('CUSTOMER','OWNER')")
     @PutMapping("/{id}")
     public ResponseEntity<String> updateBooking(
             @PathVariable("id") Long id,
@@ -98,6 +98,14 @@ public class BookingController {
     ) {
         String response = bookingService.updateStatus(id, status);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/machine/{machineId}")
+    public ResponseEntity<List<BookingListResponseDto>> getBookingsByMachine(
+            @PathVariable("machineId") Long machineId
+    ) {
+        List<BookingListResponseDto> bookingListResponseDtos = bookingService.getBookingsByMachine(machineId);
+        return ResponseEntity.ok(bookingListResponseDtos);
     }
 
     @GetMapping("/get-by-code")

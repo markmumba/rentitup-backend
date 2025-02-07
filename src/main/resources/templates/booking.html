@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Status Update</title>
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background-color: #f7fafc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .booking-details {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+
+        .details-list {
+            list-style: none;
+            padding: 0;
+            margin: 25px 0;
+        }
+
+        .details-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #edf2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .details-list li:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: 600;
+            color: #4a5568;
+            min-width: 140px;
+        }
+
+        .value {
+            color: #2d3748;
+            flex-grow: 1;
+            text-align: right;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status[data-status="CONFIRMED"] {
+            background-color: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status[data-status="PENDING"] {
+            background-color: #fefcbf;
+            color: #744210;
+        }
+
+        .status[data-status="CANCELLED"] {
+            background-color: #fed7d7;
+            color: #822727;
+        }
+
+        .message-box {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            background-color: #ebf8ff;
+            border-left: 4px solid #4299e1;
+        }
+
+        .message-box.warning {
+            background-color: #fffaf0;
+            border-left-color: #dd6b20;
+        }
+
+        .message-box.success {
+            background-color: #f0fff4;
+            border-left-color: #48bb78;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            background-color: #f7fafc;
+            border-radius: 0 0 8px 8px;
+            color: #718096;
+            font-size: 14px;
+            border-top: 1px solid #edf2f7;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        .contact-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #4299e1;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .contact-button:hover {
+            background-color: #3182ce;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            .booking-details {
+                padding: 20px;
+            }
+
+            .details-list li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .value {
+                text-align: left;
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Booking Status Update</h1>
+    </div>
+
+    <div class="booking-details">
+        <p class="greeting">Dear <span th:text="${CustomerName}">Customer</span>,</p>
+
+        <p>Your booking status has been updated. Here are your booking details:</p>
+
+        <ul class="details-list">
+            <li>
+                <span class="label">Booking Code:</span>
+                <span class="value" th:text="${bookingCode}">CODE123</span>
+            </li>
+            <li>
+                <span class="label">Status:</span>
+                <span class="status value" th:text="${bookingStatus}"
+                      th:data-status="${bookingStatus}">STATUS</span>
+            </li>
+            <li>
+                <span class="label">Machine:</span>
+                <span class="value" th:text="${machine}">Machine Name</span>
+            </li>
+            <li>
+                <span class="label">Owner:</span>
+                <span class="value" th:text="${owner}">Owner Name</span>
+            </li>
+            <li>
+                <span class="label">Pick-up Location:</span>
+                <span class="value" th:text="${location}">Location</span>
+            </li>
+            <li>
+                <span class="label">Start Date:</span>
+                <span class="value" th:text="${#temporals.format(startDate, 'dd-MM-yyyy HH:mm')}">Start Date</span>
+            </li>
+            <li>
+                <span class="label">End Date:</span>
+                <span class="value" th:text="${#temporals.format(endDate, 'dd-MM-yyyy HH:mm')}">End Date</span>
+            </li>
+        </ul>
+
+        <div th:if="${bookingStatus == 'CONFIRMED'}" class="message-box success">
+            <p>Your booking has been confirmed! Please ensure you arrive at the pick-up location on time.</p>
+        </div>
+
+        <div th:if="${bookingStatus == 'CANCELLED'}" class="message-box warning">
+            <p>Your booking has been cancelled. If you didn't request this cancellation, please contact support immediately.</p>
+        </div>
+
+        <div th:if="${bookingStatus == 'PENDING'}" class="message-box">
+            <p>Your booking is currently pending confirmation. We'll notify you as soon as it's confirmed.</p>
+        </div>
+
+        <a href="#" class="contact-button">Contact Support</a>
+    </div>
+
+    <div class="footer">
+        <p>If you have any questions or concerns, we're here to help!</p>
+        <p>© 2024 Your Company Name. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>

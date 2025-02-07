@@ -30,12 +30,13 @@ public class Booking extends BaseEntity {
 
     private String pickUpLocation;
 
+    @Enumerated(EnumType.STRING)
     private BookingStatus status ;
 
     @Column(nullable = false)
     private BigDecimal totalAmount;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "machine_id")
     private Machine machine;
 
@@ -43,13 +44,10 @@ public class Booking extends BaseEntity {
     @JoinColumn(name = "customer_id")
     private User customer;
 
-    @OneToMany(mappedBy = "booking")
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> payments;
 
-    @OneToOne(mappedBy = "booking")
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     private Review review;
-
-
-
 
 }

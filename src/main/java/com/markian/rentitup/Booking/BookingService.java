@@ -20,6 +20,8 @@ public interface BookingService {
 
     List<BookingListResponseDto> getBookingsByStatus(Long userId, String status);
 
+    List<BookingListResponseDto> getBookingsByMachine(Long machineId);
+
     String updateBooking(Long id, BookingRequestDto bookingRequestDto) throws BookingException;
 
     String deleteBooking(Long id) throws BookingException;

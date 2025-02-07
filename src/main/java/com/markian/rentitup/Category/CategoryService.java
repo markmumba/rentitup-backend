@@ -15,7 +15,6 @@ public interface CategoryService {
 
     CategoryResponseDto getCategoryById(Long id) throws CategoryException;
 
-    List<String> getPriceCalculationType();
 
     String updateCategory(Long id, CategoryRequestDto categoryDto) throws CategoryException;
 

@@ -3,12 +3,12 @@ package com.markian.rentitup.MachineImage.Impl;
 import com.markian.rentitup.Exceptions.MachineImageException;
 import com.markian.rentitup.Machine.Machine;
 import com.markian.rentitup.Machine.MachineRepository;
-import com.markian.rentitup.MachineImage.AwsS3Service;
 import com.markian.rentitup.MachineImage.MachineImage;
 import com.markian.rentitup.MachineImage.MachineImageDto.MachineImageMapper;
 import com.markian.rentitup.MachineImage.MachineImageDto.MachineImageResponseDto;
 import com.markian.rentitup.MachineImage.MachineImageRepository;
 import com.markian.rentitup.MachineImage.MachineImageService;
+import com.markian.rentitup.Utils.AwsS3Service;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -60,7 +60,7 @@ public class MachineImageServiceImpl implements MachineImageService {
 
                     MachineImage machineImage = new MachineImage();
 
-                    String imageUrl = awsS3Service.saveImageToS3(image);
+                    String imageUrl = awsS3Service.saveImageToS3(image,"machineImage/");
                     machineImage.setMachine(machine);
                     machineImage.setUrl(imageUrl);
 
@@ -126,9 +126,7 @@ public class MachineImageServiceImpl implements MachineImageService {
                 .orElseThrow(() -> new MachineImageException(
                         String.format("Image with id %d not found for machine %d", imageId, machineId)
                 ));
-        if (machineImage.getIsPrimary()) {
-            throw new MachineImageException("You cannot delete the primary image ");
-        }
+
         try {
             awsS3Service.deleteImageFromS3(machineImage.getUrl());
             machineImageRepository.delete(machineImage);

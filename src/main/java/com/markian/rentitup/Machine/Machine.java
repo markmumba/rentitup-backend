@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -21,6 +22,13 @@ public class Machine extends BaseEntity {
 
     private String description;
 
+    private Boolean verified = Boolean.FALSE;
+
+    private LocalDateTime verificationDeadline;
+
+    @Enumerated(EnumType.STRING)
+    private MachineVerificationState verificationState = MachineVerificationState.PENDING;
+
     @Column(nullable = false)
     private BigDecimal basePrice;
 
@@ -30,11 +38,12 @@ public class Machine extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MachineCondition condition;
 
+    @Column(length = 700)
     private String specification;
 
     private Boolean isAvailable;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
 
@@ -42,13 +51,18 @@ public class Machine extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-
-    @OneToMany(mappedBy = "machine")
+    @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings;
 
-    @OneToMany(mappedBy = "machine")
-    private List<MaintenanceRecord> maintainanceRecords;
+    @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MaintenanceRecord> maintenanceRecords;
 
-    @OneToMany(mappedBy = "machine")
+    @OneToMany(mappedBy = "machine",fetch =FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MachineImage> machineImages;
+
+    @Transient
+    public boolean isVerificationValid() {
+        return verified && verificationDeadline != null &&
+                LocalDateTime.now().isBefore(verificationDeadline);
+    }
 }

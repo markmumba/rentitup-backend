@@ -39,6 +39,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(MaintenanceRecordException.class)
+    public ResponseEntity<String> handleMaintenanceRecordException(MaintenanceRecordException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(ReviewException.class)
     public ResponseEntity<String> handleReviewException(ReviewException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);

@@ -1,8 +1,10 @@
 package com.markian.rentitup.User.UserDto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class AuthResponse {
     private String token;
     private String role;

@@ -7,9 +7,7 @@ import com.markian.rentitup.Category.Dto.CategoryListResponse;
 import com.markian.rentitup.Category.Dto.CategoryMapper;
 import com.markian.rentitup.Category.Dto.CategoryRequestDto;
 import com.markian.rentitup.Category.Dto.CategoryResponseDto;
-import com.markian.rentitup.Category.PriceCalculationType;
 import com.markian.rentitup.Exceptions.CategoryException;
-import com.markian.rentitup.Exceptions.MachineException;
 import org.springframework.stereotype.Service;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -61,12 +60,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponseDto getCategoryById(Long id) throws CategoryException {
-
         try {
             Category category = categoryRepository.findById(id)
                     .orElseThrow(() -> new CategoryException("could not find category by  " + id));
-            return categoryMapper.toCategoryResponseDto(category);
 
+            return categoryMapper.toCategoryResponseDto(category);
         } catch (CategoryException e) {
             throw e;
         } catch (Exception e) {
@@ -74,24 +72,17 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    @Override
-    public List<String> getPriceCalculationType() {
-        return Arrays.asList(
-                PriceCalculationType.HOURLY.name(),
-                PriceCalculationType.DAILY.name(),
-                PriceCalculationType.DISTANCE_BASED.name()
-        );
-    }
+
 
     @Override
     public String updateCategory(Long id, CategoryRequestDto categoryRequestDto) throws CategoryException {
 
         try {
+
             Category category = categoryRepository.findById(id)
                     .orElseThrow(() -> new CategoryException("could not find category by  " + id));
             category.setName(categoryRequestDto.getName());
             category.setDescription(categoryRequestDto.getDescription());
-            category.setPriceCalculationType(categoryRequestDto.getPriceCalculationType());
             categoryRepository.save(category);
 
             return "Category updated successful";

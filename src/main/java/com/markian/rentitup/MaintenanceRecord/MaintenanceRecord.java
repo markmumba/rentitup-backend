@@ -2,6 +2,7 @@ package com.markian.rentitup.MaintenanceRecord;
 
 import com.markian.rentitup.BaseEntity.BaseEntity;
 import com.markian.rentitup.Machine.Machine;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -21,7 +22,13 @@ public class MaintenanceRecord extends BaseEntity {
 
     private String performedBy;
 
+
+    @Column(nullable = false)
+    private Boolean checked = Boolean.FALSE ;
+
     private LocalDate nextService;
+
+    private String imageRecordUrl;
 
     @ManyToOne
     @JoinColumn(name = "machine_id")

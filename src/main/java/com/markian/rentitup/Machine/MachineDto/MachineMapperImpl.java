@@ -2,12 +2,13 @@ package com.markian.rentitup.Machine.MachineDto;
 
 import com.markian.rentitup.Machine.Machine;
 import com.markian.rentitup.Machine.MachineCondition;
+import com.markian.rentitup.MachineImage.MachineImage;
 import com.markian.rentitup.User.Role;
 import com.markian.rentitup.User.User;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 public class MachineMapperImpl implements MachineMapper {
@@ -20,7 +21,22 @@ public class MachineMapperImpl implements MachineMapper {
         private String fullName;
         private String phone;
         private Role role;
-        private LocalDate verifiedAt;
+        private LocalDateTime verifiedAt;
+    }
+
+    @Data
+    public static class MachineImageDto {
+        private Long id;
+        private String url;
+        private Boolean isPrimary;
+    }
+
+    public MachineImageDto fromEntity(MachineImage machineImage) {
+        MachineImageDto responseDto = new MachineImageDto();
+        responseDto.setId(machineImage.getId());
+        responseDto.setUrl(machineImage.getUrl());
+        responseDto.setIsPrimary(machineImage.getIsPrimary());
+        return responseDto;
     }
 
     public Machine toEntity(MachineRequestDto dto) {
@@ -42,8 +58,18 @@ public class MachineMapperImpl implements MachineMapper {
         responseDto.setSpecification(machine.getSpecification());
         responseDto.setIsAvailable(machine.getIsAvailable());
         responseDto.setCondition(machine.getCondition());
-        responseDto.setOwner(toSimpleUserDto(machine.getOwner()));
-        responseDto.setMachineImages(machine.getMachineImages());
+        responseDto.setVerificationState(machine.getVerificationState());
+        responseDto.setVerified(machine.getVerified());
+        if (machine.getOwner() != null) {
+            responseDto.setOwner(toSimpleUserDto(machine.getOwner()));
+        }
+        if (machine.getMachineImages() != null) {
+            responseDto.setMachineImages(
+                    machine.getMachineImages().stream()
+                            .map(this::fromEntity)
+                            .toList()
+            );
+        }
         if (machine.getCategory() != null) {
             responseDto.setCategoryId(machine.getCategory().getId());
         }
@@ -58,6 +84,15 @@ public class MachineMapperImpl implements MachineMapper {
         responseDto.setBasePrice(machine.getBasePrice());
         responseDto.setIsAvailable(machine.getIsAvailable());
         responseDto.setCondition(machine.getCondition());
+        responseDto.setDescription(machine.getDescription());
+        responseDto.setVerified(machine.getVerified());
+        responseDto.setMachineImageUrl(machine.getMachineImages()
+                .stream()
+                .filter(MachineImage::getIsPrimary)
+                .map(MachineImage::getUrl)
+                .findFirst()
+                .orElse(null));
+
 
         if (machine.getCategory() != null) {
             responseDto.setCategoryId(machine.getCategory().getId());

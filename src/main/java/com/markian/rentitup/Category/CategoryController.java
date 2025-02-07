@@ -41,11 +41,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryResponseDto);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/calculation-types")
-    public ResponseEntity<List<String>> getCalculationTypes() {
-        return ResponseEntity.ok(categoryService.getPriceCalculationType());
-    }
+
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}")

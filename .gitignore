@@ -31,6 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
-
-src/main/resources/application.yml
 docker-compose.yml
+.env
+setup_and_build.sh

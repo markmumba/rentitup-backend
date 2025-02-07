@@ -1,6 +1,6 @@
 package com.markian.rentitup.Security;
 
-import com.markian.rentitup.User.CustomUserDetalisService;
+import com.markian.rentitup.User.CustomUserDetailsService;
 import com.markian.rentitup.Utils.JwtTokenUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,12 +20,12 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
-    private final CustomUserDetalisService customUserDetalisService;
+    private final CustomUserDetailsService customUserDetailsService;
 
 
-    public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil,CustomUserDetalisService customUserDetalisService) {
+    public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil,CustomUserDetailsService customUserDetailsService) {
         this.jwtTokenUtil = jwtTokenUtil;
-        this.customUserDetalisService =  customUserDetalisService;
+        this.customUserDetailsService =  customUserDetailsService;
 
     }
 
@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             username = jwtTokenUtil.extractUsername(jwt);
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.customUserDetalisService.loadUserByUsername(username);
+            UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(username);
             if (jwtTokenUtil.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
@@ -53,3 +53,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+
